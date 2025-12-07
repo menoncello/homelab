@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "proxmox": {
+      "command": "ssh",
+      "args": ["root@192.168.31.237", "cd", "/root/ProxmoxMCP-Plus", "&&", "source", ".venv/bin/activate", "&&", "python", "-m", "proxmox_mcp.server"],
+      "env": {
+        "PROXMOX_MCP_CONFIG": "/root/ProxmoxMCP-Plus/proxmox-config/config.json"
+      }
+    }
+  }
+}

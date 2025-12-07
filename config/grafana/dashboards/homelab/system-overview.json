@@ -1,0 +1,106 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Homelab System Overview",
+    "tags": ["homelab", "system", "overview"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Status",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "up{job=\"node-exporter\"}",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {"options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}, "type": "value"}
+            ],
+            "thresholds": {"steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "CPU Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "100 - (avg by(instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "yAxes": [{"max": 100, "min": 0, "unit": "percent"}],
+        "alert": {
+          "conditions": [
+            {"evaluator": {"params": [80], "type": "gt"}, "operator": {"type": "and"}, "query": {"params": ["A", "5m", "now"]}}
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "yAxes": [{"max": 100, "min": 0, "unit": "percent"}]
+      },
+      {
+        "id": 4,
+        "title": "Disk Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100",
+            "legendFormat": "{{instance}}:{{mountpoint}}"
+          }
+        ],
+        "yAxes": [{"max": 100, "min": 0, "unit": "percent"}]
+      },
+      {
+        "id": 5,
+        "title": "Network Traffic",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]) * 8",
+            "legendFormat": "RX {{instance}}"
+          },
+          {
+            "expr": "rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]) * 8",
+            "legendFormat": "TX {{instance}}"
+          }
+        ],
+        "yAxes": [{"unit": "bps"}]
+      },
+      {
+        "id": 6,
+        "title": "Container Count",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "count(container_last_seen)",
+            "legendFormat": "Total Containers"
+          }
+        ]
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "30s"
+  }
+}

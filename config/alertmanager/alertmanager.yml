@@ -1,0 +1,229 @@
+# Alertmanager Configuration
+# ==========================
+
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'homelab-alerts@your-domain.com'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-app-password'
+  smtp_require_tls: true
+
+# Routing configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 5s
+      repeat_interval: 5m
+      routes:
+        - match:
+            category: database
+          receiver: 'database-critical'
+        - match:
+            category: infrastructure
+          receiver: 'infrastructure-critical'
+
+    # Warning alerts - less frequent
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 30s
+      repeat_interval: 2h
+      routes:
+        - match:
+            category: services
+          receiver: 'services-warning'
+
+    # Security alerts - immediate
+    - match:
+        category: security
+      receiver: 'security-alerts'
+      group_wait: 0s
+      repeat_interval: 1h
+
+# Receivers configuration
+receivers:
+  # Default receiver
+  - name: 'default'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[Homelab Alert] {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
+          {{ end }}
+        html: |
+          <h2>Homelab Alert</h2>
+          {{ range .Alerts }}
+          <h3>{{ .Annotations.summary }}</h3>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Labels:</strong></p>
+          <ul>
+          {{ range .Labels.SortedPairs }}<li>{{ .Name }}={{ .Value }}</li>{{ end }}
+          </ul>
+          <hr>
+          {{ end }}
+
+  # Critical alerts receiver
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[CRITICAL] Homelab Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          🚨 CRITICAL ALERT 🚨
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Instance: {{ .Labels.instance }}
+          Severity: {{ .Labels.severity }}
+          Category: {{ .Labels.category }}
+
+          Immediate action required!
+          {{ end }}
+    webhook_configs:
+      - url: 'http://uptime-kuma:3001/api/push/your-webhook-id'
+        send_resolved: true
+        http_config:
+          basic_auth:
+            username: your-webhook-user
+            password: your-webhook-password
+
+  # Database critical receiver
+  - name: 'database-critical'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[DATABASE CRITICAL] {{ .GroupLabels.alertname }}'
+        body: |
+          🗄️ DATABASE CRITICAL ALERT 🗄️
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Instance: {{ .Labels.instance }}
+          Database Type: {{ .Labels.job }}
+
+          Database services may be affected. Check immediately!
+          {{ end }}
+
+  # Infrastructure critical receiver
+  - name: 'infrastructure-critical'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[INFRASTRUCTURE CRITICAL] {{ .GroupLabels.alertname }}'
+        body: |
+          🔧 INFRASTRUCTURE CRITICAL ALERT 🔧
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Instance: {{ .Labels.instance }}
+
+          Core infrastructure services affected. Immediate attention required!
+          {{ end }}
+
+  # Warning alerts receiver
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[WARNING] Homelab Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          ⚠️ WARNING ALERT ⚠️
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Instance: {{ .Labels.instance }}
+          Severity: {{ .Labels.severity }}
+
+          Monitor this situation.
+          {{ end }}
+
+  # Services warning receiver
+  - name: 'services-warning'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[SERVICES WARNING] {{ .GroupLabels.alertname }}'
+        body: |
+          📦 SERVICES WARNING ALERT 📦
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.job }}
+          Instance: {{ .Labels.instance }}
+
+          Service performance may be degraded.
+          {{ end }}
+
+  # Security alerts receiver
+  - name: 'security-alerts'
+    email_configs:
+      - to: 'admin@your-domain.com'
+        subject: '[SECURITY ALERT] {{ .GroupLabels.alertname }}'
+        body: |
+          🔒 SECURITY ALERT 🔒
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Instance: {{ .Labels.instance }}
+
+          Review logs immediately and take action if needed.
+          {{ end }}
+    webhook_configs:
+      - url: 'http://uptime-kuma:3001/api/push/your-security-webhook'
+        send_resolved: true
+
+# Inhibition rules
+inhibit_rules:
+  # Inhibit service alerts if the node is down
+  - source_match:
+      alertname: 'NodeDown'
+    target_match_re:
+      alertname: 'ServiceDown'
+    equal: ['instance']
+
+  # Inhibit database alerts if the database node is down
+  - source_match:
+      alertname: 'NodeDown'
+      category: 'database'
+    target_match:
+      category: 'database'
+    equal: ['instance']
+
+  # Inhibit warning alerts if critical alerts exist for same instance
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['instance']
+
+# Silence rules (can be applied via API)
+# silences: []
+
+# Time intervals
+time_intervals:
+  - name: 'business-hours'
+    time_intervals:
+      - times:
+          - start_time: '09:00'
+            end_time: '17:00'
+        weekdays: ['monday:friday']
+
+  - name: 'after-hours'
+    time_intervals:
+      - times:
+          - start_time: '17:01'
+            end_time: '08:59'
+        weekdays: ['monday:friday']
+      - weekdays: ['saturday', 'sunday']

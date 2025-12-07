@@ -1,0 +1,15 @@
+mode: nginx
+crowdsec:
+  lapi_scheme: http
+  lapi_host: crowdsec
+  lapi_port: 8080
+  lapi_key: ${CROWDSEC_BOUNCER_KEY}
+  update_frequency: 10s
+  log_level: info
+  log_dir: /var/log/crowdsec-bouncer
+  cache_size: 1000
+  decisions_stream: true
+  remediation: true
+  spoofed_ip_header: X-Forwarded-For
+  request_timeout: 1ms
+  request_max_retries: 3

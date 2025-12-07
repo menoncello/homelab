@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - cloudflare
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    volumes:
+      - ./config:/etc/cloudflared
+      - cloudflared_logs:/var/log/cloudflared
+
+  # Secondary tunnel for backup/dedicated services
+  cloudflared-backup:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-backup
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_BACKUP_TOKEN}
+    networks:
+      - cloudflare
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_BACKUP_TOKEN}
+    volumes:
+      - ./config-backup:/etc/cloudflared
+      - cloudflared_backup_logs:/var/log/cloudflared
+
+volumes:
+  cloudflared_logs:
+  cloudflared_backup_logs:
+
+networks:
+  cloudflare:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/16
