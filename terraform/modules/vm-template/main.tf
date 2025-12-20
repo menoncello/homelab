@@ -17,17 +17,17 @@ resource "proxmox_virtual_environment_vm" "vm" {
   # Disks - Use first boot disk
   disk {
     datastore_id = var.storage_pool
+    interface    = "scsi0"
     size         = var.disk_size_gb
   }
 
   # Network
   network_device {
     bridge = "vmbr0"
-    vlan_tag = var.vlan_tag
   }
 
   # Tags
-  tags = join(",", var.tags)
+  tags = var.tags
 
   # Cloud-init via serial console (for now, simplified)
   serial_device {

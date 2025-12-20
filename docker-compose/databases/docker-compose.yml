@@ -1,24 +1,7 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./config/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=homelab
-    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=4G --max-connections=200
-    restart: unless-stopped
-    networks:
-      - databases
-
+  # PostgreSQL - Simplified
   postgresql:
     image: postgres:15
     container_name: postgresql
@@ -26,14 +9,27 @@ services:
       - "5432:5432"
     volumes:
       - postgresql_data:/var/lib/postgresql/data
-      - ./config/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./config/postgresql/pg_hba.conf:/etc/postgresql/pg_hba.conf
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+      - POSTGRES_DB=homelab
+      - POSTGRES_USER=homelab
+      - POSTGRES_PASSWORD=HomelabPostgres2024!
+    restart: unless-stopped
+    networks:
+      - databases
+
+  # MySQL - Simplified
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=HomelabMySQL2024!
+      - MYSQL_DATABASE=homelab
+      - MYSQL_USER=homelab
+      - MYSQL_PASSWORD=HomelabMySQL2024!
     restart: unless-stopped
     networks:
       - databases
@@ -130,7 +126,7 @@ services:
     image: adminer:latest
     container_name: adminer
     ports:
-      - "8080:8080"
+      - "8888:8080"
     environment:
       - ADMINER_DEFAULT_SERVER=mysql
     restart: unless-stopped

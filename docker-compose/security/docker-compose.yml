@@ -70,9 +70,6 @@ services:
     networks:
       - homelab-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.vault.rule=Host(`vault.${DOMAIN}`)"
-      - "traefik.http.routers.vault.tls=true"
       - "com.homelab.service=vault"
       - "com.homelab.category=security"
 
@@ -97,37 +94,15 @@ services:
     profiles:
       - production
 
-  # Vault Exporter for Prometheus monitoring
-  vault-exporter:
-    image: murat1/vault-exporter:latest
-    container_name: vault-exporter
-    restart: unless-stopped
-    environment:
-      VAULT_ADDR: "http://vault:8200"
-      VAULT_TOKEN: "${VAULT_ROOT_TOKEN}"
-      VAULT_EXPORTER_TELEMETRY_PATH: "/metrics"
-      VAULT_EXPORTER_TELEMETRY_ADDRESS: ":9105"
-    ports:
-      - "9105:9105"
-    depends_on:
-      - vault
-    networks:
-      - homelab-network
-    labels:
-      - "com.homelab.service=vault-exporter"
-      - "com.homelab.category=monitoring"
-
   # Vault UI Proxy (optional enhanced UI)
   vault-ui:
-    image: djenriquez/vault-ui:latest
-    container_name: vault-ui
+    image: nginx:alpine
+    container_name: vault-ui-proxy
     restart: unless-stopped
     ports:
-      - "8000:8000"
-    environment:
-      VAULT_URL_DEFAULT: "http://vault:8200"
-      VAULT_AUTH_TYPE: "token"
-      VAULT_TOKEN: "${VAULT_ROOT_TOKEN}"
+      - "8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - vault
     networks:

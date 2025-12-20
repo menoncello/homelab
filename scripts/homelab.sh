@@ -91,6 +91,7 @@ show_help() {
     echo "  config                 Show configuration status"
     echo "  config check          Validate all configurations"
     echo "  config doctor          Run diagnostics"
+    echo "  config lid-cover       Configure Helios to ignore lid cover"
     echo
     echo -e "${CYAN}Info:${NC}"
     echo "  info                  Show system information"
@@ -339,7 +340,14 @@ execute_command() {
             manage_service "$cmd" "${args[@]}"
             ;;
         "config")
-            show_config "${args[@]}"
+            case "${1:-}" in
+                "lid-cover")
+                    "$SCRIPT_DIR/configure-lid-cover.sh" "${args[@]}"
+                    ;;
+                *)
+                    show_config "${args[@]}"
+                    ;;
+            esac
             ;;
         "info")
             show_info
