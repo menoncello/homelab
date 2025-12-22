@@ -1,0 +1,68 @@
+# GPU Services Stack
+# Jellyfin media server with GPU acceleration
+# Deploy with: docker stack deploy -c stacks/gpu-services/docker-compose.yml gpu-services
+
+version: '3.8'
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    hostname: jellyfin
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+      restart_policy:
+        condition: unless-stopped
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.homelab.local
+      - TZ=America/Sao_Paulo
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - movies-data:/media/movies
+      - series-data:/media/series
+      - anime-data:/media/anime
+    networks:
+      - homelab-net
+    ports:
+      - target: 8096
+        published: 8096
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  jellyfin-config:
+    external: true
+    name: jellyfin-config
+
+  jellyfin-cache:
+    driver: local
+    name: jellyfin-cache
+
+  movies-data:
+    external: true
+    name: movies-data
+
+  series-data:
+    external: true
+    name: series-data
+
+  anime-data:
+    external: true
+    name: anime-data
