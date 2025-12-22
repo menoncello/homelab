@@ -1,0 +1,70 @@
+# Pi-hole Stack
+# DNS server with ad blocking and network-wide protection
+# Deploy with: docker stack deploy -c stacks/pihole/docker-compose.yml pihole
+
+version: '3.8'
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    hostname: pihole
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.proxy == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - WEBPASSWORD=piholeadmin2024
+      - PIHOLE_DNS_=1.1.1.1;1.0.0.1
+      - DNSMASQ_LISTENING=all
+      - SERVERIP=192.168.31.237
+      - VIRTUAL_HOST=pihole.homelab.local
+      - WEBTHEME=default-darker
+    volumes:
+      - pihole-config:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
+    networks:
+      - homelab-net
+    ports:
+      # DNS (TCP/UDP)
+      - target: 53
+        published: 53
+        protocol: tcp
+        mode: host
+      - target: 53
+        published: 53
+        protocol: udp
+        mode: host
+      # Web Interface (porta alternativa para não conflitar com Nginx)
+      - target: 80
+        published: 8053
+        protocol: tcp
+        mode: host
+      # DHCP (opcional)
+      - target: 67
+        published: 67
+        protocol: udp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  pihole-config:
+    driver: local
+    name: pihole-config
+
+  pihole-dnsmasq:
+    driver: local
+    name: pihole-dnsmasq
