@@ -1,0 +1,79 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.env
+.env.local
+.env.*.local
+docker-compose.override.yml
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Backup files
+backups/
+*.bak
+*.backup
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Build artifacts
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Node modules (if any node tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Python (if any python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Terraform (if using terraform in the future)
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+tfplan
+
+# Ansible (if using ansible)
+*.retry
+ansible/group_vars/all/vault.yml
+
+# Editor backup
+*~
+\#*\#
+.\#*
