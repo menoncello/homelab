@@ -19,7 +19,8 @@ services:
         reservations:
           memory: 1G
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
+        max_attempts: 3
     environment:
       - PUID=1000
       - PGID=1000
@@ -59,7 +60,8 @@ services:
         reservations:
           memory: 512M
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
+        max_attempts: 3
     environment:
       - PUID=1000
       - PGID=1000
@@ -90,7 +92,8 @@ services:
         reservations:
           memory: 1G
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
+        max_attempts: 3
     environment:
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
@@ -119,7 +122,8 @@ services:
         reservations:
           memory: 256M
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
+        max_attempts: 3
     volumes:
       - redis-data:/data
     networks:
@@ -132,13 +136,13 @@ networks:
 
 secrets:
   postgres_user:
-    file: ./stacks/content/secrets/postgres_user.txt
+    file: ./secrets/postgres_user.txt
 
   postgres_password:
-    file: ./stacks/content/secrets/postgres_password.txt
+    file: ./secrets/postgres_password.txt
 
   postgres_db:
-    file: ./stacks/content/secrets/postgres_db.txt
+    file: ./secrets/postgres_db.txt
 
 volumes:
   nextcloud-data:

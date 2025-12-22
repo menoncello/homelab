@@ -19,7 +19,8 @@ services:
         reservations:
           memory: 256M
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
+        max_attempts: 3
     environment:
       - PUID=1000
       - PGID=1000
