@@ -12,7 +12,10 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 - **CPU:** Intel Core i7 11ª geração
 - **RAM:** 64GB DDR4
 - **GPU:** NVIDIA RTX 3070ti Mobile
-- **Storage:** 480GB SSD (principal) + 2TB HDD (mídia)
+- **Storage:**
+- nvme1n1p7 (/data) - 337.8GB - Docker configs
+- nvme1n1p3 (/media) - 955.6GB - Media libraries
+- nvme0n1p1 (/srv) - 444.5GB - Backup/expansão
 
 **Serviços:**
 - Docker Swarm Manager
@@ -25,7 +28,9 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 ### Xeon01 (Worker Node) - 192.168.31.208
 - **CPU:** Intel Xeon E5-2686
 - **RAM:** 96GB DDR4
-- **Storage:** 480GB SSD (principal) + 1TB HDD (dados)
+- **Storage:**
+- nvme1n1p1 (/srv) - 434.1GB - Docker configs
+- ubuntu-vg-lv--0 (/home) - 793.8GB - Nextcloud data & Audiobooks
 
 **Serviços:**
 - Docker Swarm Worker
@@ -37,9 +42,9 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 
 ## Estrutura de Storage
 
-### Helios (SSD 480GB)
+### Helios (NVMe /data - 337.8GB)
 ```
-/docker/
+/data/docker/
 ├── jellyfin/
 │   ├── config/
 │   └── cache/
@@ -51,7 +56,7 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 └── nginx-proxy/
 ```
 
-### Helios (HDD 2TB - Mídia)
+### Helios (NVMe /media - 955.6GB)
 ```
 /media/
 ├── movies/
@@ -60,9 +65,9 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 └── incomplete/
 ```
 
-### Xeon01 (SSD 480GB)
+### Xeon01 (NVMe /srv - 434.1GB)
 ```
-/docker/
+/srv/docker/
 ├── nextcloud/
 │   ├── config/
 │   └── data/

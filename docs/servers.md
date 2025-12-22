@@ -12,7 +12,10 @@ Homelab com 2 servidores em rede 2.5Gbps, conexão fibra 600/200 Mbps.
 - **CPU:** Intel Core i7 11ª geração
 - **RAM:** 64GB DDR4
 - **GPU:** NVIDIA RTX 3070ti Mobile
-- **Storage:** 2TB HDD + 480GB SSD
+- **Storage:**
+- nvme1n1p7 (/data) - 337.8GB - Docker configs
+- nvme1n1p3 (/media) - 955.6GB - Media libraries
+- nvme0n1p1 (/srv) - 444.5GB - Backup/expansão
 - **SO:** Ubuntu 25.04
 - **Função:** Docker Swarm Manager + Serviços GPU
 
@@ -46,7 +49,9 @@ docker context use homelab
 **Especificações:**
 - **CPU:** Intel Xeon E5-2686
 - **RAM:** 96GB DDR4
-- **Storage:** 1TB HDD + 480GB SSD
+- **Storage:**
+- nvme1n1p1 (/srv) - 434.1GB - Docker configs
+- ubuntu-vg-lv--0 (/home) - 793.8GB - Nextcloud data & Audiobooks
 - **SO:** Ubuntu 25.04
 - **Função:** Docker Swarm Worker
 

@@ -178,13 +178,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-ssd/docker/jellyfin
+      device: /data/docker/jellyfin
 ```
 
 **Host paths:**
-- **Helios SSD:** `/mnt/helios-ssd/docker/` - Container configs
-- **Helios HDD:** `/mnt/helios-hdd/media/` - Media libraries
-- **Xeon01 SSD:** `/mnt/xeon01-ssd/docker/` - Databases and data
+- **Helios /data:** `/data/docker/` - Container configs
+- **Helios /media:** `/media/` - Media libraries
+- **Xeon01 /srv:** `/srv/docker/` - Container configs
+- **Xeon01 /home:** `/home/docker-data/` - Database and user data
 
 ### Volume Creation
 
@@ -196,9 +197,10 @@ volumes:
 **Permissions:**
 ```bash
 # All volumes owned by UID 1000
-sudo chown -R 1000:1000 /mnt/helios-ssd/docker/
-sudo chown -R 1000:1000 /mnt/helios-hdd/media/
-sudo chown -R 1000:1000 /mnt/xeon01-ssd/docker/
+sudo chown -R 1000:1000 /data/docker/
+sudo chown -R 1000:1000 /media/
+sudo chown -R 1000:1000 /srv/docker/
+sudo chown -R 1000:1000 /home/docker-data/
 ```
 
 **Never use:** Named volumes without bind mounts (performance issues in Swarm)
@@ -412,7 +414,7 @@ docker exec postgresql pg_dump -U nextcloud nextcloud > backup.sql
 **Nextcloud:**
 ```bash
 # Data directory
-rsync -av /mnt/xeon01-ssd/docker/nextcloud/ /backup/nextcloud/
+rsync -av /srv/docker/nextcloud/ /backup/nextcloud/
 
 # Database
 docker exec nextcloud php occ db:add-maintenance-activation
@@ -518,10 +520,10 @@ docker inspect jellyfin | grep -i nvidia
 **Volume permission errors:**
 ```bash
 # Check volume ownership
-ls -la /mnt/helios-ssd/docker/
+ls -la /data/docker/
 
 # Fix permissions
-sudo chown -R 1000:1000 /mnt/helios-ssd/docker/
+sudo chown -R 1000:1000 /data/docker/
 ```
 
 **Network connectivity:**

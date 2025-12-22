@@ -158,19 +158,21 @@ git commit -m "feat: add GPU runtime setup and Jellyfin GPU support"
 echo "Creating persistent volume structure..."
 
 # Helios volumes
-sudo mkdir -p /mnt/helios-ssd/docker/{jellyfin,sonarr,radarr,transmission,nginx-proxy}
-sudo mkdir -p /mnt/helios-hdd/media/{movies,series,anime,incomplete}
+sudo mkdir -p /data/docker/{jellyfin,sonarr,radarr,transmission,nginx-proxy}
+sudo mkdir -p /media/{movies,series,anime,incomplete}
 
 # Xeon01 volumes
-sudo mkdir -p /mnt/xeon01-ssd/docker/{nextcloud,audiobookshelf,postgresql}
-sudo mkdir -p /mnt/xeon01-ssd/docker/nextcloud/data
-sudo mkdir -p /mnt/xeon01-ssd/docker/audiobookshelf/{config,metadata,audiobooks}
-sudo mkdir -p /mnt/xeon01-ssd/docker/postgresql/data
+sudo mkdir -p /srv/docker/{nextcloud,audiobookshelf,postgresql}
+sudo mkdir -p /srv/docker/nextcloud/data
+sudo mkdir -p /srv/docker/audiobookshelf/{config,metadata,audiobooks}
+sudo mkdir -p /srv/docker/postgresql/data
+sudo mkdir -p /home/docker-data/audiobooks
 
 # Set permissions
-sudo chown -R 1000:1000 /mnt/helios-ssd/docker/
-sudo chown -R 1000:1000 /mnt/helios-hdd/media/
-sudo chown -R 1000:1000 /mnt/xeon01-ssd/docker/
+sudo chown -R 1000:1000 /data/docker/
+sudo chown -R 1000:1000 /media/
+sudo chown -R 1000:1000 /srv/docker/
+sudo chown -R 1000:1000 /home/docker-data/
 
 echo "Volume structure created!"
 ```
@@ -216,28 +218,28 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-ssd/docker/jellyfin
+      device: /data/docker/jellyfin
 
   sonarr-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-ssd/docker/sonarr
+      device: /data/docker/sonarr
 
   radarr-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-ssd/docker/radarr
+      device: /data/docker/radarr
 
   transmission-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-ssd/docker/transmission
+      device: /data/docker/transmission
 
   # Xeon01 volumes
   nextcloud-data:
@@ -245,28 +247,28 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/xeon01-ssd/docker/nextcloud
+      device: /srv/docker/nextcloud
 
   audiobookshelf-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/xeon01-ssd/docker/audiobookshelf/config
+      device: /srv/docker/audiobookshelf/config
 
   audiobooks-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/xeon01-ssd/docker/audiobookshelf/audiobooks
+      device: /home/docker-data/audiobooks
 
   postgresql-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/xeon01-ssd/docker/postgresql/data
+      device: /srv/docker/postgresql/data
 
   # Media volumes (shared between stacks)
   movies-data:
@@ -274,21 +276,21 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-hdd/media/movies
+      device: /media/movies
 
   series-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-hdd/media/series
+      device: /media/series
 
   downloads-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /mnt/helios-hdd/media/incomplete
+      device: /media/incomplete
 ```
 
 **Step 4: Create environment template**
@@ -300,9 +302,10 @@ COMPOSE_PROJECT_NAME=infrastructure
 NETWORK_NAME=homelab-net
 
 # Volume paths (adjust as needed)
-HELIOS_SSD_PATH=/mnt/helios-ssd/docker
-HELIOS_HDD_PATH=/mnt/helios-hdd/media
-XEON01_SSD_PATH=/mnt/xeon01-ssd/docker
+HELIOS_DATA_PATH=/data/docker
+HELIOS_MEDIA_PATH=/media
+XEON01_SRV_PATH=/srv/docker
+XEON01_HOME_PATH=/home/docker-data
 ```
 
 **Step 5: Deploy infrastructure stack**
