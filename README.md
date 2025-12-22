@@ -39,7 +39,7 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
 ### 1. Clone Repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/menoncello/homelab.git
 cd homelab
 ```
 
