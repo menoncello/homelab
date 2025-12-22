@@ -15,6 +15,7 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
 
 **Stacks:**
 - `infrastructure` - Base volumes and network
+- `pihole` - DNS server with ad blocking
 - `gpu-services` - Jellyfin with GPU transcoding
 - `arr-stack` - Sonarr, Radarr, Transmission
 - `content` - Nextcloud, Audiobookshelf, PostgreSQL, Redis
@@ -87,6 +88,9 @@ After deployment:
 
 - **Nginx Proxy Manager:** http://192.168.31.237:81
   - Default: admin@example.com / changeme
+- **Pi-hole:** http://192.168.31.237:8053/admin
+  - Default: piholeadmin2024
+  - Configure your router's DNS to point to 192.168.31.237
 
 - **Configure proxy hosts** in Nginx Proxy Manager:
   - jellyfin.homelab.local → jellyfin:8096
@@ -97,6 +101,21 @@ After deployment:
   - audiobooks.homelab.local → audiobookshelf:80
 
 ## Stack Details
+
+### Pi-hole Stack
+- **Pi-hole:** Network-wide DNS with ad blocking
+  - Constraints: `node.labels.proxy == true`
+  - Placement: Helios only
+  - DNS server on port 53 (TCP/UDP)
+  - Web interface on port 8053
+  - Default password: piholeadmin2024
+
+**Setup:**
+1. Access http://192.168.31.237:8053/admin
+2. Login with piholeadmin2024
+3. Change password
+4. Configure router DHCP to use 192.168.31.237 as DNS server
+5. Add local DNS records for *.homelab.local
 
 ### Infrastructure Stack
 Creates persistent volumes bound to NVMe mount points.
