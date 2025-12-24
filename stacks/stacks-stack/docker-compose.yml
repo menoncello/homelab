@@ -23,7 +23,7 @@ services:
     environment:
       - USERNAME=admin
       - PASSWORD=admin123
-      - SOLVERR_URL=flaresolverr:8191
+      - SOLVERR_URL=http://flaresolverr:8191
       - TZ=America/Sao_Paulo
     volumes:
       - stacks-config:/config
