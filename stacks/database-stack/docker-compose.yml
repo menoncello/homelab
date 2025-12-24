@@ -28,6 +28,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgresql-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
     networks:
       - homelab-net
     ports:
