@@ -52,19 +52,22 @@ echo ""
 
 # Wait for PostgreSQL to be healthy
 echo "Waiting for PostgreSQL to be healthy..."
+XEON01_IP="192.168.31.208"
 for i in {1..30}; do
-    if docker exec -it $(docker ps -q -f name=database_postgresql) pg_isready -U postgres > /dev/null 2>&1; then
+    if ssh eduardo@$XEON01_IP "docker exec -it \$(docker ps -q -f name=database_postgresql) pg_isready -U postgres" > /dev/null 2>&1; then
         break
     fi
     echo "  Waiting... ($i/30)"
     sleep 2
 done
 
-# Create n8n database and user
-docker exec -it $(docker ps -q -f name=database_postgresql) psql -U postgres <<EOF
+# Create n8n database and user (on Xeon01 where PostgreSQL runs)
+ssh eduardo@$XEON01_IP "docker exec -it \$(docker ps -q -f name=database_postgresql) psql -U postgres" <<EOF
 CREATE DATABASE n8n;
 CREATE USER n8n WITH ENCRYPTED PASSWORD '$N8N_PASSWORD';
 GRANT ALL PRIVILEGES ON DATABASE n8n TO n8n;
+\c n8n
+GRANT ALL ON SCHEMA public TO n8n;
 \q
 EOF
 echo -e "${GREEN}✓ n8n database created${NC}"
