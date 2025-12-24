@@ -22,7 +22,7 @@ services:
         condition: any
     environment:
       - USERNAME=admin
-      - PASSWORD_FILE=/run/secrets/stacks_password
+      - PASSWORD=admin123
       - SOLVERR_URL=flaresolverr:8191
       - TZ=America/Sao_Paulo
     volumes:
@@ -36,8 +36,6 @@ services:
         published: 7788
         protocol: tcp
         mode: host
-    secrets:
-      - stacks_password
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -68,10 +66,6 @@ networks:
   homelab-net:
     external: true
     name: homelab-net
-
-secrets:
-  stacks_password:
-    file: ./secrets/stacks_password.txt
 
 volumes:
   stacks-config:

@@ -7,7 +7,7 @@ Stacks is a lightweight download manager for Anna's Archive (books, comics, maga
 - **URL:** http://192.168.31.208:7788
 - **Default credentials:**
   - Username: `admin`
-  - Password: (set via secret)
+  - Password: `admin123` (change after first login!)
 
 ## Features
 
@@ -27,16 +27,11 @@ sudo mkdir -p /srv/docker/books
 sudo chown -R 1000:1000 /srv/docker/stacks
 sudo chown -R 1000:1000 /srv/docker/books
 
-# 2. Create secret file (on manager)
-cd ~/homelab/stacks/stacks-stack/secrets
-cp stacks_password.txt.example stacks_password.txt
-nano stacks_password.txt  # Set secure password
-
-# 3. Deploy stack (from manager)
+# 2. Deploy stack (from manager)
 cd ~/homelab/stacks/stacks-stack
 docker stack deploy -c docker-compose.yml stacks
 
-# 4. Verify deployment
+# 3. Verify deployment
 docker service ps stacks_stacks
 docker service logs -f stacks_stacks
 ```
@@ -45,7 +40,7 @@ docker service logs -f stacks_stacks
 
 After first launch:
 
-1. **Settings tab** → Change default password
+1. **Settings tab** → Change default password (`admin123`)
 2. **Copy API key** for Tampermonkey script
 3. **Configure Anna's Archive key** (if you have membership)
 4. **Adjust download delays and retry settings**
@@ -75,6 +70,6 @@ FlareSolverr is included to bypass Cloudflare/DDoS-Guard protection on mirror si
 
 ## Tips
 
-- Use strong password for web interface
+- Change default password immediately after first login
 - Don't expose to internet without VPN/reverse proxy
 - Download queue is persistent across restarts
