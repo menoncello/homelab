@@ -55,28 +55,28 @@ if [ ! -f "$N8N_PASSWORD_FILE" ]; then
     openssl rand -hex 16 > "$N8N_PASSWORD_FILE"
 fi
 N8N_PASSWORD=$(cat "$N8N_PASSWORD_FILE")
-echo "Using password from: $N8N_PASSWORD_FILE"
 
-# Wait for PostgreSQL to be healthy
-echo "Waiting for PostgreSQL to be healthy..."
-XEON01_IP="192.168.31.208"
-for i in {1..30}; do
-    if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 eduardo@$XEON01_IP "docker exec \$(docker ps -q -f name=database_postgresql) pg_isready -U postgres" > /dev/null 2>&1; then
-        break
-    fi
-    echo "  Waiting... ($i/30)"
-    sleep 2
-done
+echo ""
+echo "=========================================="
+echo "  Run these commands on XEON01:"
+echo "=========================================="
+echo ""
+echo "# Wait for PostgreSQL to be ready, then:"
+echo 'docker exec -it $(docker ps -q -f name=database_postgresql) psql -U postgres'
+echo ""
+echo "Then run this SQL:"
+echo "CREATE DATABASE n8n;"
+echo "CREATE USER n8n WITH ENCRYPTED PASSWORD '$N8N_PASSWORD';"
+echo "GRANT ALL PRIVILEGES ON DATABASE n8n TO n8n;"
+echo '\\c n8n'
+echo "GRANT ALL ON SCHEMA public TO n8n;"
+echo '\\q'
+echo ""
+echo "=========================================="
+echo ""
 
-# Create n8n database and user (on Xeon01 where PostgreSQL runs)
-ssh -o StrictHostKeyChecking=no eduardo@$XEON01_IP "docker exec \$(docker ps -q -f name=database_postgresql) psql -U postgres" <<EOF
-CREATE DATABASE n8n;
-CREATE USER n8n WITH ENCRYPTED PASSWORD '$N8N_PASSWORD';
-GRANT ALL PRIVILEGES ON DATABASE n8n TO n8n;
-\c n8n
-GRANT ALL ON SCHEMA public TO n8n;
-\q
-EOF
+# Wait for user to create the database
+read -p "Press ENTER after creating the n8n database on Xeon01..."
 echo -e "${GREEN}✓ n8n database created${NC}"
 echo ""
 
