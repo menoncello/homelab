@@ -24,6 +24,7 @@ services:
     environment:
       - TZ=America/Sao_Paulo
       - TIMEOUT=10000
+      - SECRET_ENCRYPTION_KEY=bd01d3b99d7c28f55759aeaaedbe20293dddf52ec6e8b4c59b6885a94465cb19
     volumes:
       - homarr-config:/app/data/configs
       - homarr-data:/app/data
