@@ -4,7 +4,7 @@ Lidarr is a music collection manager for Usenet and BitTorrent users.
 
 ## Access
 
-- **URL:** http://192.168.31.237:8686
+- **URL:** http://192.168.31.75:8686
 - **Default credentials:**
   - Username: admin
   - Password: (set on first launch)
@@ -13,7 +13,7 @@ Lidarr is a music collection manager for Usenet and BitTorrent users.
 
 ```bash
 # 1. Create volume directories (on Helios)
-ssh eduardo@192.168.31.237
+ssh eduardo@192.168.31.75
 sudo mkdir -p /data/docker/lidarr
 sudo chown -R 1000:1000 /data/docker/lidarr
 
@@ -23,7 +23,7 @@ sudo mkdir -p /home/docker-data/music
 sudo chown -R 1000:1000 /home/docker-data/music
 
 # 3. Ensure downloads directory exists (on Helios)
-ssh eduardo@192.168.31.237
+ssh eduardo@192.168.31.75
 sudo mkdir -p /media/downloads
 sudo chown -R 1000:1000 /media/downloads
 

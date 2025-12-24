@@ -4,14 +4,14 @@ A sleek, modern dashboard that puts all of your homelab services in one place.
 
 ## Access
 
-- **URL:** http://192.168.31.237:7575
+- **URL:** http://192.168.31.75:7575
 - **Default credentials:** Set on first launch
 
 ## First Time Setup
 
 ```bash
 # 1. Create volume directories (on Helios)
-ssh eduardo@192.168.31.237
+ssh eduardo@192.168.31.75
 sudo mkdir -p /data/docker/homarr/data
 sudo chown -R 1000:1000 /data/docker/homarr
 
@@ -44,12 +44,12 @@ Homarr stores configuration in `/data/docker/homarr` on Helios:
 
 | Service | URL | Category |
 |---------|-----|----------|
-| Jellyfin | http://192.168.31.237:8096 | Media |
-| Sonarr | http://192.168.31.237:8989 | Automation |
-| Radarr | http://192.168.31.237:7878 | Automation |
-| Lidarr | http://192.168.31.237:8686 | Automation |
+| Jellyfin | http://192.168.31.75:8096 | Media |
+| Sonarr | http://192.168.31.75:8989 | Automation |
+| Radarr | http://192.168.31.75:7878 | Automation |
+| Lidarr | http://192.168.31.75:8686 | Automation |
 | n8n | http://192.168.31.208:5678 | Automation |
 | Nextcloud | http://192.168.31.208:8080 | Cloud |
 | Audiobookshelf | http://192.168.31.208:13378 | Media |
-| Nginx Proxy Manager | http://192.168.31.237:81 | Infrastructure |
-| Pi-hole | http://192.168.31.237:8053 | Infrastructure |
+| Nginx Proxy Manager | http://192.168.31.75:81 | Infrastructure |
+| Pi-hole | http://192.168.31.75:8053 | Infrastructure |

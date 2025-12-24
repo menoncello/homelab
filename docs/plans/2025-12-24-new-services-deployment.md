@@ -23,8 +23,8 @@ Adding 5 new services to the homelab:
 ### Step 1: Create Volumes (Both Servers)
 
 ```bash
-# On Helios (192.168.31.237)
-ssh eduardo@192.168.31.237
+# On Helios (192.168.31.75)
+ssh eduardo@192.168.31.75
 cd ~/homelab
 ./scripts/setup-new-services-volumes.sh
 
@@ -101,9 +101,9 @@ docker service ps homarr_homarr
 
 | Service | URL | Location |
 |---------|-----|----------|
-| Homarr | http://192.168.31.237:7575 | Dashboard |
+| Homarr | http://192.168.31.75:7575 | Dashboard |
 | n8n | http://192.168.31.208:5678 | Workflow automation |
-| Lidarr | http://192.168.31.237:8686 | Music manager |
+| Lidarr | http://192.168.31.75:8686 | Music manager |
 | PostgreSQL | 192.168.31.208:5432 | Database |
 | Redis | 192.168.31.208:6379 | Cache |
 
@@ -111,20 +111,20 @@ docker service ps homarr_homarr
 
 ### Homarr
 
-1. Open http://192.168.31.237:7575
+1. Open http://192.168.31.75:7575
 2. Create admin account
 3. Add services to dashboard:
-   - Jellyfin: http://192.168.31.237:8096
-   - Sonarr: http://192.168.31.237:8989
-   - Radarr: http://192.168.31.237:7878
-   - Lidarr: http://192.168.31.237:8686
+   - Jellyfin: http://192.168.31.75:8096
+   - Sonarr: http://192.168.31.75:8989
+   - Radarr: http://192.168.31.75:7878
+   - Lidarr: http://192.168.31.75:8686
    - n8n: http://192.168.31.208:5678
    - Nextcloud: http://192.168.31.208:8080
    - Audiobookshelf: http://192.168.31.208:13378
 
 ### Lidarr
 
-1. Open http://192.168.31.237:8686
+1. Open http://192.168.31.75:8686
 2. Set up download client (Transmission)
 3. Set up indexer (Jackett)
 4. Configure music quality profiles
