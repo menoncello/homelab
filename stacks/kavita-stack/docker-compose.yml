@@ -1,0 +1,54 @@
+# Kavita Stack
+# Modern digital library server for EPUB, PDF, comics, and manga
+# Deploy with: docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
+
+version: '3.8'
+
+services:
+  kavita:
+    image: kavitareader/kavita:latest
+    hostname: kavita
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: any
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - kavita-config:/config
+      - kavita-books:/books
+    networks:
+      - homelab-net
+    ports:
+      - target: 5000
+        published: 5000
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  kavita-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/kavita/config
+
+  kavita-books:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/books

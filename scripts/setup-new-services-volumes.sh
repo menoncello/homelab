@@ -63,6 +63,18 @@ setup_xeon01() {
     sudo mkdir -p /home/docker-data/music
     sudo chown -R 1000:1000 /home/docker-data/music
 
+    # Kavita
+    echo "  -> Creating Kavita volumes..."
+    sudo mkdir -p /srv/docker/kavita/config
+    sudo mkdir -p /srv/docker/books
+    sudo chown -R 1000:1000 /srv/docker/kavita
+    sudo chown -R 1000:1000 /srv/docker/books
+
+    # Stacks
+    echo "  -> Creating Stacks volumes..."
+    sudo mkdir -p /srv/docker/stacks/{config,logs}
+    sudo chown -R 1000:1000 /srv/docker/stacks
+
     echo "✓ Xeon01 volumes created!"
 }
 
@@ -88,5 +100,8 @@ echo "Xeon01 volumes:"
 echo "  /srv/docker/postgresql"
 echo "  /srv/docker/redis"
 echo "  /srv/docker/n8n"
+echo "  /srv/docker/kavita/config"
+echo "  /srv/docker/books (shared with Stacks)"
+echo "  /srv/docker/stacks/{config,logs}"
 echo ""
 echo "==> Done! Ready to deploy new services."
