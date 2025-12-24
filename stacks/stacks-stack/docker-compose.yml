@@ -26,9 +26,9 @@ services:
       - SOLVERR_URL=http://flaresolverr:8191
       - TZ=America/Sao_Paulo
     volumes:
-      - stacks-config:/config
-      - stacks-downloads:/downloads
-      - stacks-logs:/logs
+      - stacks-config:/opt/stacks/config
+      - stacks-downloads:/opt/stacks/download
+      - stacks-logs:/opt/stacks/logs
     networks:
       - homelab-net
     ports:
