@@ -34,11 +34,6 @@ services:
         published: 7575
         protocol: tcp
         mode: host
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:7575"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 networks:
   homelab-net:
