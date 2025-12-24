@@ -1,0 +1,107 @@
+# Database Stack
+# PostgreSQL and Redis for all homelab services
+# Deploy with: docker stack deploy -c stacks/database-stack/docker-compose.yml database
+
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:15-alpine
+    hostname: postgresql
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.database == true
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    networks:
+      - homelab-net
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: host
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat $$POSTGRES_USER_FILE)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command: redis-server --appendonly yes --requirepass $$(cat $$REDIS_PASSWORD_FILE)
+    volumes:
+      - redis-data:/data
+    networks:
+      - homelab-net
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+    secrets:
+      - redis_password
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+
+  postgres_db:
+    file: ./secrets/postgres_db.txt
+
+  redis_password:
+    file: ./secrets/redis_password.txt
+
+volumes:
+  postgresql-data:
+    external: true
+    name: postgresql-data
+
+  redis-data:
+    external: true
+    name: redis-data
