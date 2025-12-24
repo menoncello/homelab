@@ -99,9 +99,15 @@ secrets:
 
 volumes:
   postgresql-data:
-    external: true
-    name: postgresql-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/postgresql
 
   redis-data:
-    external: true
-    name: redis-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/redis

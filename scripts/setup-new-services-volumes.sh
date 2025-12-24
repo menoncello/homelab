@@ -38,6 +38,16 @@ setup_helios() {
 setup_xeon01() {
     echo "==> Setting up Xeon01 volumes (192.168.31.208)..."
 
+    # PostgreSQL
+    echo "  -> Creating PostgreSQL volumes..."
+    sudo mkdir -p /srv/docker/postgresql
+    sudo chown -R 999:999 /srv/docker/postgresql
+
+    # Redis
+    echo "  -> Creating Redis volumes..."
+    sudo mkdir -p /srv/docker/redis
+    sudo chown -R 999:999 /srv/docker/redis
+
     # n8n
     echo "  -> Creating n8n volumes..."
     sudo mkdir -p /srv/docker/n8n
@@ -69,6 +79,8 @@ echo "  /data/docker/lidarr"
 echo "  /media/downloads"
 echo ""
 echo "Xeon01 volumes:"
+echo "  /srv/docker/postgresql"
+echo "  /srv/docker/redis"
 echo "  /srv/docker/n8n"
 echo "  /home/docker-data/music"
 echo ""
