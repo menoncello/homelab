@@ -6,7 +6,7 @@ version: '3.8'
 
 services:
   kavita:
-    image: kavitareader/kavita:latest
+    image: jvmilazz0/kavita:latest
     hostname: kavita
     deploy:
       replicas: 1
@@ -23,7 +23,7 @@ services:
     environment:
       - TZ=America/Sao_Paulo
     volumes:
-      - kavita-config:/config
+      - kavita-config:/kavita/config
       - kavita-books:/books
     networks:
       - homelab-net
