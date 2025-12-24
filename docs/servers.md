@@ -20,24 +20,28 @@ Homelab com 2 servidores em rede 2.5Gbps, conexão fibra 600/200 Mbps.
 - **Função:** Docker Swarm Manager + Serviços GPU
 
 **Rede:**
-- **IP:** 192.168.31.237
+- **IP:** 192.168.31.75
 - **Interface:** [Identificar interface 2.5G]
 - **Porta Docker API:** 2375 (TCP)
 
-**Serviços Planejados:**
+**Serviços:**
 - Docker Swarm Manager
-- Serviços com aceleração GPU
-- Machine Learning / AI
-- Transcoding de vídeo
-- serviços principais do homelab
+- Jellyfin (GPU transcoding)
+- Sonarr (TV automation)
+- Radarr (Movie automation)
+- Lidarr (Music automation)
+- Transmission (Torrent)
+- Homarr (Dashboard)
+- Nginx Proxy Manager (Reverse proxy)
+- Pi-hole (DNS + Ad blocking)
 
 **Acesso:**
 ```bash
 # SSH
-ssh eduardo@192.168.31.237
+ssh eduardo@192.168.31.75
 
 # Docker Remoto
-export DOCKER_HOST="tcp://192.168.31.237:2375"
+export DOCKER_HOST="tcp://192.168.31.75:2375"
 # ou
 docker context use homelab
 ```
@@ -60,12 +64,15 @@ docker context use homelab
 - **Interface:** [Identificar interface]
 - **Porta Docker API:** Acesso via manager (Swarm)
 
-**Serviços Planejados:**
+**Serviços:**
 - Docker Swarm Worker
-- Bancos de dados (MySQL, PostgreSQL)
-- Cache (Redis)
-- Serviços que precisam de muita RAM
-- Backup e storage
+- PostgreSQL (Shared database)
+- Redis (Cache/Queue)
+- Nextcloud (File storage)
+- Audiobookshelf (Audiobooks)
+- n8n (Workflow automation)
+- Kavita (Ebook/comic reader)
+- Stacks (Anna's Archive downloader)
 
 **Acesso:**
 ```bash
@@ -86,7 +93,7 @@ docker node ls
 Internet (600/200 Fibra)
     ↓
 Roteador/Switch 2.5Gbps
-    ├── Helios (192.168.31.237) - Manager
+    ├── Helios (192.168.31.75) - Manager
     └── Xeon01 (192.168.31.208) - Worker
 ```
 
@@ -98,6 +105,27 @@ Roteador/Switch 2.5Gbps
 | Node Communication | 7946 | TCP/UDP | Comunicação entre nós |
 | Overlay Network | 4789 | UDP | Tráfego de rede overlay |
 | SSH | 22 | TCP | Acesso remoto |
+
+### Portas dos Serviços (Helios - 192.168.31.75)
+| Serviço | Porta | URL |
+|---------|-------|-----|
+| Jellyfin | 8096 | http://192.168.31.75:8096 |
+| Sonarr | 8989 | http://192.168.31.75:8989 |
+| Radarr | 7878 | http://192.168.31.75:7878 |
+| Lidarr | 8686 | http://192.168.31.75:8686 |
+| Transmission | 9091 | http://192.168.31.75:9091 |
+| Homarr | 7575 | http://192.168.31.75:7575 |
+| Nginx Proxy Manager | 81 | http://192.168.31.75:81 |
+| Pi-hole (Web) | 8053 | http://192.168.31.75:8053/admin |
+
+### Portas dos Serviços (Xeon01 - 192.168.31.208)
+| Serviço | Porta | URL |
+|---------|-------|-----|
+| Nextcloud | 8080 | http://192.168.31.208:8080 |
+| Audiobookshelf | 80 | http://192.168.31.208:80 |
+| n8n | 5678 | http://192.168.31.208:5678 |
+| Kavita | 5000 | http://192.168.31.208:5000 |
+| Stacks | 7788 | http://192.168.31.208:7788 |
 
 ### Rede Docker Swarm
 - **Rede Overlay:** homelab-net (criada para comunicação interna)
@@ -111,21 +139,40 @@ Roteador/Switch 2.5Gbps
 ### ✅ Concluído
 - [x] Ubuntu 25.04 instalado em ambos os servidores
 - [x] Rede 2.5Gbps configurada
-- [x] Docker Engine instalado (Helios)
+- [x] Docker Engine instalado (ambos servidores)
 - [x] Docker API TCP configurado (Helios:2375)
 - [x] Acesso remoto Docker funcionando
 - [x] Docker Swarm initialization
 - [x] Xeon01 ingressar no cluster
+- [x] Rede overlay homelab-net criada
+- [x] Labels dos nós configurados
+- [x] Todos os stacks implantados
 
-### 🔄 Em Progresso
-- [ ] Configuração de rede overlay
-- [ ] Labels dos nós para deploy seletivo
+### 🔄 Serviços Ativos
+**Helios (GPU/ARR/Proxy):**
+- [x] Jellyfin (GPU transcoding)
+- [x] Sonarr (TV)
+- [x] Radarr (Movies)
+- [x] Lidarr (Music)
+- [x] Transmission (Torrents)
+- [x] Homarr (Dashboard)
+- [x] Nginx Proxy Manager
+- [x] Pi-hole (DNS)
+
+**Xeon01 (Storage/Database):**
+- [x] PostgreSQL
+- [x] Redis
+- [x] Nextcloud
+- [x] Audiobookshelf
+- [x] n8n (Automation)
+- [x] Kavita (Ebooks)
+- [x] Stacks (Anna's Archive)
 
 ### ⏳ Planejado
 - [ ] Setup de storage compartilhado
-- [ ] Configuração de monitoring
-- [ ] Backup automático
-- [ ] Serviços específicos por nó
+- [ ] Configuração de monitoring (Prometheus/Grafana)
+- [ ] Backup automático (restic)
+- [ ] URLs com proxy reverso
 
 ---
 
@@ -165,8 +212,8 @@ docker node inspect xeon01
 docker info --format '{{.Swarm}}'
 
 # Testar conectividade
-ping -c 3 192.168.31.237
-telnet 192.168.31.237 2375
+ping -c 3 192.168.31.75
+telnet 192.168.31.75 2375
 ```
 
 ---
@@ -176,11 +223,11 @@ telnet 192.168.31.237 2375
 ### Do Computador Local
 ```bash
 # Usando Docker Context
-docker context update homelab --docker "host=ssh://eduardo@192.168.31.237:2375"
+docker context update homelab --docker "host=ssh://eduardo@192.168.31.75:2375"
 docker context use homelab
 
 # Variável de ambiente
-export DOCKER_HOST="tcp://192.168.31.237:2375"
+export DOCKER_HOST="tcp://192.168.31.75:2375"
 docker ps
 ```
 
@@ -211,6 +258,6 @@ docker ps
 
 ## Última Atualização
 
-**Data:** 2025-12-22
-**Status:** Configuração em andamento
-**Próximos passos:** Finalizar Docker Swarm setup
+**Data:** 2025-12-24
+**Status:** Todos os stacks implantados e funcionando
+**Próximos passos:** Configurar URLs com proxy reverso

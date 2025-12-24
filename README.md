@@ -5,7 +5,7 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
 ## Architecture
 
 **Servers:**
-- **Helios** (192.168.31.237) - Manager Node, GPU services
+- **Helios** (192.168.31.75) - Manager Node, GPU services
   - i7 11th gen, 64GB RAM, RTX 3070ti Mobile
   - Storage: `/data` (337.8GB), `/media` (955.6GB), `/srv` (444.5GB)
 
@@ -17,9 +17,14 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
 - `infrastructure` - Base volumes and network
 - `pihole` - DNS server with ad blocking
 - `gpu-services` - Jellyfin with GPU transcoding
-- `arr-stack` - Sonarr, Radarr, Transmission
-- `content` - Nextcloud, Audiobookshelf, PostgreSQL, Redis
+- `arr-stack` - Sonarr, Radarr, Transmission, Lidarr
+- `content` - Nextcloud, Audiobookshelf
+- `database-stack` - PostgreSQL, Redis (shared databases)
 - `proxy` - Nginx Proxy Manager
+- `homarr-stack` - Dashboard for all services
+- `n8n-stack` - Workflow automation
+- `kavita-stack` - Ebook/comic reading server
+- `stacks-stack` - Anna's Archive download manager
 
 ## Prerequisites
 
@@ -32,10 +37,10 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
    docker swarm init
 
    # On Xeon01 (worker)
-   docker swarm join --token [token] 192.168.31.237:2377
+   docker swarm join --token [token] 192.168.31.75:2377
    ```
 
-## Quick Startw
+## Quick Start
 
 ### 1. Clone Repository
 
@@ -77,28 +82,53 @@ docker network create --driver overlay --attachable homelab-net
 # 5. Deploy stacks in order
 docker stack deploy -c stacks/infrastructure/docker-compose.yml infrastructure
 docker stack deploy -c stacks/proxy/docker-compose.yml proxy
+docker stack deploy -c stacks/database-stack/docker-compose.yml database-stack
 docker stack deploy -c stacks/content/docker-compose.yml content
 docker stack deploy -c stacks/gpu-services/docker-compose.yml gpu-services
 docker stack deploy -c stacks/arr-stack/docker-compose.yml arr-stack
+docker stack deploy -c stacks/homarr-stack/docker-compose.yml homarr-stack
+docker stack deploy -c stacks/n8n-stack/docker-compose.yml n8n-stack
+docker stack deploy -c stacks/lidarr-stack/docker-compose.yml lidarr-stack
+docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
+docker stack deploy -c stacks/stacks-stack/docker-compose.yml stacks
 ```
 
 ## Access Services
 
 After deployment:
 
-- **Nginx Proxy Manager:** http://192.168.31.237:81
-  - Default: admin@example.com / changeme
-- **Pi-hole:** http://192.168.31.237:8053/admin
-  - Default: piholeadmin2024
-  - Configure your router's DNS to point to 192.168.31.237
+**Dashboard & Management:**
+- **Homarr:** http://192.168.31.75:7575 - Dashboard for all services
+- **Nginx Proxy Manager:** http://192.168.31.75:81 - Reverse proxy (admin@example.com / changeme)
+- **Pi-hole:** http://192.168.31.75:8053/admin - DNS with ad blocking (piholeadmin2024)
 
-- **Configure proxy hosts** in Nginx Proxy Manager:
+**Media:**
+- **Jellyfin:** http://192.168.31.75:8096 - Media server with GPU transcoding
+- **Sonarr:** http://192.168.31.75:8989 - TV series automation
+- **Radarr:** http://192.168.31.75:7878 - Movie automation
+- **Lidarr:** http://192.168.31.75:8686 - Music automation
+- **Transmission:** http://192.168.31.75:9091 - Torrent downloads
+
+**Content & Reading:**
+- **Nextcloud:** http://192.168.31.208:8080 - File storage and collaboration
+- **Audiobookshelf:** http://192.168.31.208:80 - Audiobook management
+- **Kavita:** http://192.168.31.208:5000 - Ebook/comic reading server
+- **Stacks:** http://192.168.31.208:7788 - Anna's Archive download manager (admin/admin123)
+
+**Automation:**
+- **n8n:** http://192.168.31.208:5678 - Workflow automation
+
+**Configure proxy hosts** in Nginx Proxy Manager:
   - jellyfin.homelab.local → jellyfin:8096
   - sonarr.homelab.local → sonarr:8989
   - radarr.homelab.local → radarr:7878
+  - lidarr.homelab.local → lidarr:8686
   - transmission.homelab.local → transmission:9091
   - nextcloud.homelab.local → nextcloud:8080
   - audiobooks.homelab.local → audiobookshelf:80
+  - kavita.homelab.local → kavita:5000
+  - stacks.homelab.local → stacks:7788
+  - n8n.homelab.local → n8n:5678
 
 ## Stack Details
 
@@ -130,16 +160,38 @@ Creates persistent volumes bound to NVMe mount points.
 - **Sonarr:** TV series automation
 - **Radarr:** Movie automation
 - **Transmission:** Torrent downloads
+- **Lidarr:** Music automation
   - Constraints: `node.labels.arr == true`
   - Placement: Helios only
 
 ### Content Stack
 - **Nextcloud:** File storage and collaboration
 - **Audiobookshelf:** Audiobook management
-- **PostgreSQL:** Database for services
-- **Redis:** Caching for Nextcloud
-  - Constraints: `node.labels.storage == true` / `node.labels.database == true`
+  - Constraints: `node.labels.storage == true`
   - Placement: Xeon01 only
+
+### Database Stack
+- **PostgreSQL:** Shared database for services
+- **Redis:** Caching and job queue
+  - Constraints: `node.labels.database == true`
+  - Placement: Xeon01 only
+
+### Dashboard Stack
+- **Homarr:** Dashboard for all services
+  - Constraints: `node.labels.arr == true`
+  - Placement: Helios only
+
+### Automation Stack
+- **n8n:** Workflow automation
+  - Constraints: `node.labels.storage == true`
+  - Placement: Xeon01 only
+
+### Reading Stack
+- **Kavita:** Ebook/comic reading server
+- **Stacks:** Anna's Archive download manager with FlareSolverr
+  - Constraints: `node.labels.storage == true`
+  - Placement: Xeon01 only
+  - Shared folder: `/srv/docker/books`
 
 ### Proxy Stack
 - **Nginx Proxy Manager:** Reverse proxy with SSL
@@ -278,5 +330,5 @@ MIT
 
 ---
 
-**Last Updated:** 2025-12-22
+**Last Updated:** 2025-12-24
 **Maintainer:** @eduardo
