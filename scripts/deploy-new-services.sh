@@ -47,14 +47,21 @@ sleep 10
 
 # Step 2: Create n8n database
 echo -e "${YELLOW}[2/5] Creating n8n database...${NC}"
-read -sp "Enter password for n8n database user: " N8N_PASSWORD
-echo ""
+
+# Check if n8n password file exists, if not create a random one
+N8N_PASSWORD_FILE="$PROJECT_ROOT/stacks/n8n-stack/secrets/n8n_db_password.txt"
+if [ ! -f "$N8N_PASSWORD_FILE" ]; then
+    echo "Creating n8n database password..."
+    openssl rand -hex 16 > "$N8N_PASSWORD_FILE"
+fi
+N8N_PASSWORD=$(cat "$N8N_PASSWORD_FILE")
+echo "Using password from: $N8N_PASSWORD_FILE"
 
 # Wait for PostgreSQL to be healthy
 echo "Waiting for PostgreSQL to be healthy..."
 XEON01_IP="192.168.31.208"
 for i in {1..30}; do
-    if ssh eduardo@$XEON01_IP "docker exec -it \$(docker ps -q -f name=database_postgresql) pg_isready -U postgres" > /dev/null 2>&1; then
+    if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 eduardo@$XEON01_IP "docker exec \$(docker ps -q -f name=database_postgresql) pg_isready -U postgres" > /dev/null 2>&1; then
         break
     fi
     echo "  Waiting... ($i/30)"
@@ -62,7 +69,7 @@ for i in {1..30}; do
 done
 
 # Create n8n database and user (on Xeon01 where PostgreSQL runs)
-ssh eduardo@$XEON01_IP "docker exec -it \$(docker ps -q -f name=database_postgresql) psql -U postgres" <<EOF
+ssh -o StrictHostKeyChecking=no eduardo@$XEON01_IP "docker exec \$(docker ps -q -f name=database_postgresql) psql -U postgres" <<EOF
 CREATE DATABASE n8n;
 CREATE USER n8n WITH ENCRYPTED PASSWORD '$N8N_PASSWORD';
 GRANT ALL PRIVILEGES ON DATABASE n8n TO n8n;
@@ -77,23 +84,10 @@ echo ""
 echo -e "${YELLOW}[3/5] Deploying n8n-stack...${NC}"
 cd "$PROJECT_ROOT/stacks/n8n-stack"
 
-# Check if secrets exist
-if [ ! -f "./secrets/n8n_db_password.txt" ] || [ ! -f "./secrets/n8n_encryption_key.txt" ]; then
-    echo "ERROR: n8n secrets not found!"
-    echo "Please run:"
-    echo "  cd stacks/n8n-stack/secrets"
-    echo "  cp n8n_db_password.txt.example n8n_db_password.txt"
-    echo "  cp n8n_encryption_key.txt.example n8n_encryption_key.txt"
-    echo "  echo '$N8N_PASSWORD' > n8n_db_password.txt"
-    echo "  openssl rand -hex 32 > n8n_encryption_key.txt"
-    exit 1
-fi
-
-# Verify DB password matches
-if [ "$(cat ./secrets/n8n_db_password.txt)" != "$N8N_PASSWORD" ]; then
-    echo "WARNING: n8n_db_password.txt doesn't match the password you just set!"
-    echo "Updating n8n_db_password.txt..."
-    echo "$N8N_PASSWORD" > ./secrets/n8n_db_password.txt
+# Create encryption key if not exists
+if [ ! -f "./secrets/n8n_encryption_key.txt" ]; then
+    echo "Creating n8n encryption key..."
+    openssl rand -hex 32 > ./secrets/n8n_encryption_key.txt
 fi
 
 docker stack deploy -c docker-compose.yml n8n
