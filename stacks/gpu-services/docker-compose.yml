@@ -29,9 +29,9 @@ services:
     volumes:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
-      - movies-data:/media/movies
-      - series-data:/media/series
-      - anime-data:/media/anime
+      - /media/movies:/media/movies
+      - /media/series:/media/series
+      - /media/incomplete:/media/incomplete
     networks:
       - homelab-net
     ports:
@@ -53,15 +53,3 @@ volumes:
   jellyfin-cache:
     driver: local
     name: jellyfin-cache
-
-  movies-data:
-    external: true
-    name: movies-data
-
-  series-data:
-    external: true
-    name: series-data
-
-  anime-data:
-    external: true
-    name: anime-data

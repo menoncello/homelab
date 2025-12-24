@@ -6,7 +6,7 @@ version: '3.8'
 
 services:
   sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
+    image: ghcr.io/linuxserver/sonarr:latest
     hostname: sonarr
     deploy:
       replicas: 1
@@ -27,9 +27,9 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - sonarr-config:/config
-      - series-data:/media/series
-      - anime-data:/media/anime
-      - downloads-data:/downloads
+      - /media/series:/media/series
+      - /media/movies:/media/movies
+      - /media/incomplete:/downloads
     networks:
       - homelab-net
     ports:
@@ -39,7 +39,7 @@ services:
         mode: host
 
   radarr:
-    image: lscr.io/linuxserver/radarr:latest
+    image: ghcr.io/linuxserver/radarr:latest
     hostname: radarr
     deploy:
       replicas: 1
@@ -60,8 +60,8 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - radarr-config:/config
-      - movies-data:/media/movies
-      - downloads-data:/downloads
+      - /media/movies:/media/movies
+      - /media/incomplete:/downloads
     networks:
       - homelab-net
     ports:
@@ -71,7 +71,7 @@ services:
         mode: host
 
   transmission:
-    image: lscr.io/linuxserver/transmission:latest
+    image: lscr.io/linuxserver/qbittorrent:latest
     hostname: transmission
     deploy:
       replicas: 1
@@ -87,13 +87,14 @@ services:
         condition: on-failure
         max_attempts: 3
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=911
+      - PGID=911
       - TZ=America/Sao_Paulo
       - WEBUI_PORT=9091
+      - UMASK=000
     volumes:
       - transmission-config:/config
-      - downloads-data:/downloads
+      - /media/incomplete:/downloads
       - transmission-watch:/watch
     networks:
       - homelab-net
@@ -102,13 +103,76 @@ services:
         published: 9091
         protocol: tcp
         mode: host
-      - target: 51413
-        published: 51413
+      - target: 6881
+        published: 6881
         protocol: tcp
         mode: host
-      - target: 51413
-        published: 51413
+      - target: 6881
+        published: 6881
         protocol: udp
+        mode: host
+
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    hostname: bazarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - bazarr-config:/config
+      - /media/series:/media/series
+      - /media/movies:/media/movies
+    networks:
+      - homelab-net
+    ports:
+      - target: 6767
+        published: 6767
+        protocol: tcp
+        mode: host
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett:latest
+    hostname: jackett
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - jackett-config:/config
+      - /media/incomplete:/downloads
+    networks:
+      - homelab-net
+    ports:
+      - target: 9117
+        published: 9117
+        protocol: tcp
         mode: host
 
 networks:
@@ -133,18 +197,10 @@ volumes:
     driver: local
     name: transmission-watch
 
-  series-data:
+  bazarr-config:
     external: true
-    name: series-data
+    name: bazarr-config
 
-  anime-data:
+  jackett-config:
     external: true
-    name: anime-data
-
-  movies-data:
-    external: true
-    name: movies-data
-
-  downloads-data:
-    external: true
-    name: downloads-data
+    name: jackett-config

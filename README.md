@@ -35,7 +35,7 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
    docker swarm join --token [token] 192.168.31.237:2377
    ```
 
-## Quick Start
+## Quick Startw
 
 ### 1. Clone Repository
 
