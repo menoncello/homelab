@@ -68,4 +68,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/docker-data/music
+      device: /media/music

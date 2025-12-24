@@ -27,6 +27,11 @@ setup_helios() {
     sudo mkdir -p /data/docker/lidarr
     sudo chown -R 1000:1000 /data/docker/lidarr
 
+    # Music library for Lidarr
+    echo "  -> Creating music library..."
+    sudo mkdir -p /media/music
+    sudo chown -R 1000:1000 /media/music
+
     # Downloads (shared)
     echo "  -> Ensuring downloads directory exists..."
     sudo mkdir -p /media/downloads
@@ -76,12 +81,12 @@ echo "==> Verifying volumes..."
 echo "Helios volumes:"
 echo "  /data/docker/homarr"
 echo "  /data/docker/lidarr"
+echo "  /media/music"
 echo "  /media/downloads"
 echo ""
 echo "Xeon01 volumes:"
 echo "  /srv/docker/postgresql"
 echo "  /srv/docker/redis"
 echo "  /srv/docker/n8n"
-echo "  /home/docker-data/music"
 echo ""
 echo "==> Done! Ready to deploy new services."
