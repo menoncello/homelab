@@ -19,7 +19,7 @@ services:
         reservations:
           memory: 1G
       restart_policy:
-        condition: unless-stopped
+        condition: any
     environment:
       - PUID=1000
       - PGID=1000
