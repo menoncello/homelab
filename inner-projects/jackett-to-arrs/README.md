@@ -1,15 +1,15 @@
 # Jackett to Arrs
 
-Add Jackett indexers to Sonarr and Radarr automatically via API.
+Sync all configured Jackett indexers to Sonarr and Radarr automatically via API.
 
 ## Features
 
-- ✅ Adds indexers to Sonarr and Radarr via Torznab
+- ✅ Automatically reads all configured indexers from Jackett (using Puppeteer)
 - ✅ Skips indexers that already exist
-- ✅ Adds appropriate categories for TV (Sonarr) and Movies (Radarr)
+- ✅ Only adds indexers that support the respective categories (TV/Movies)
 - ✅ Dry run mode for testing
 - ✅ Environment variables via `.env` file
-- ✅ No Jackett admin API access required
+- ✅ No manual configuration needed
 
 ## Setup
 
@@ -28,14 +28,11 @@ Add Jackett indexers to Sonarr and Radarr automatically via API.
    cp .env.example .env
    ```
 
-4. **Edit `.env` and add your API keys and indexer list:**
+4. **Edit `.env` and add your API keys:**
    ```env
    JACKETT_URL=http://192.168.31.75:9117
-   INDEXER_LIST=torrentday:TorrentDay,iptorrents:IPTorrents,limetorrents:LimeTorrents
-
    SONARR_URL=http://192.168.31.75:8989
    SONARR_API_KEY=your_sonarr_api_key_here
-
    RADARR_URL=http://192.168.31.75:7878
    RADARR_API_KEY=your_radarr_api_key_here
    ```
@@ -44,19 +41,6 @@ Add Jackett indexers to Sonarr and Radarr automatically via API.
 
 - **Sonarr:** Settings → General → API Key
 - **Radarr:** Settings → General → API Key
-
-## Finding Indexer IDs
-
-To find your Jackett indexer IDs:
-
-1. Open Jackett web UI
-2. Click on an indexer
-3. Look at the URL: `http://jackett-url/UI/Dashboard#indexer=xyz`
-4. The `xyz` part is your indexer ID
-
-For example, if the URL is `http://192.168.31.75:9117/UI/Dashboard#indexer=torrentday`, then:
-- Indexer ID: `torrentday`
-- Display Name: `TorrentDay` (or any name you prefer)
 
 ## Usage
 
@@ -72,11 +56,13 @@ DRY_RUN=true bun run add-indexers
 
 ## How It Works
 
-1. Reads indexer list from `INDEXER_LIST` environment variable
-2. Checks which indexers already exist in Sonarr/Radarr
-3. Adds missing indexers automatically using Jackett's Torznab endpoint:
-   - Sonarr: Adds with TV categories (8000, 8010, 8020, 8030)
-   - Radarr: Adds with Movie categories (2000-2080)
+1. Uses Puppeteer to open Jackett web UI and get session cookies
+2. Fetches all configured indexers from Jackett API using the cookies
+3. Checks which indexers already exist in Sonarr/Radarr
+4. Adds missing indexers automatically:
+   - Sonarr: Only adds indexers that support TV categories (8000, 8010, 8020, 8030)
+   - Radarr: Only adds indexers that support Movie categories (2000-2080)
+5. Skips semi-private and private indexers by default
 
 ## Configuration
 
@@ -85,23 +71,20 @@ All configuration is done via environment variables in `.env`:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `JACKETT_URL` | No | `http://192.168.31.75:9117` | Jackett URL |
-| `INDEXER_LIST` | Yes | - | Comma-separated `id:Name` pairs |
 | `SONARR_URL` | No | `http://192.168.31.75:8989` | Sonarr URL |
 | `SONARR_API_KEY` | Yes | - | Sonarr API key |
 | `RADARR_URL` | No | `http://192.168.31.75:7878` | Radarr URL |
 | `RADARR_API_KEY` | Yes | - | Radarr API key |
 | `DRY_RUN` | No | `false` | Test without adding |
 
-### INDEXER_LIST Format
+## Filtering Indexers
 
-```
-INDEXER_LIST=id1:Display Name 1,id2:Display Name 2,id3:Display Name 3
-```
+The script includes filters to skip certain indexer types. Modify `getJackettIndexers()` in `add-indexers.ts`:
 
-Examples:
-- Single indexer: `INDEXER_LIST=torrentday:TorrentDay`
-- Multiple indexers: `INDEXER_LIST=torrentday:TorrentDay,iptorrents:IPTorrents,limetorrents:LimeTorrents`
-- ID only (name same as ID): `INDEXER_LIST=torrentday,iptorrents`
+```typescript
+.filter((i: any) => i.type !== "semi-private")  // Skip semi-private
+.filter((i: any) => !i.id.includes("zetorrents"))  // Skip specific indexer
+```
 
 ## Category IDs
 
@@ -127,7 +110,12 @@ Examples:
 ```
 🎬 Syncing Jackett indexers to Sonarr and Radarr...
 
-📡 Found 3 indexers to process
+🔐 Connecting to Jackett web UI to get session cookies...
+   ✅ Got session cookies
+
+📡 Fetching indexers from Jackett...
+   Found 50 total indexers
+   12 configured/public indexers
 
 📦 Processing: TorrentDay (torrentday)
   ✅ Added "TorrentDay" to Sonarr
@@ -137,13 +125,11 @@ Examples:
   ⏭️  Already in Sonarr, skipping...
   ⏭️  Already in Radarr, skipping...
 
-📦 Processing: LimeTorrents (limetorrents)
-  ✅ Added "LimeTorrents" to Sonarr
-  ✅ Added "LimeTorrents" to Radarr
+...
 
 ✨ Done!
-   Sonarr: 2 new indexers added
-   Radarr: 2 new indexers added
+   Sonarr: 5 new indexers added
+   Radarr: 7 new indexers added
 ```
 
 ## Tips
@@ -152,4 +138,4 @@ Examples:
 - Safe to run multiple times - skips existing indexers
 - Use `DRY_RUN=true` to test before actually adding
 - The `.env` file is git-ignored for security
-- You don't need Jackett admin API access or API keys
+- Puppeteer runs in headless mode (no UI)
