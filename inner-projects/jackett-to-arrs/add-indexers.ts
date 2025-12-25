@@ -51,7 +51,8 @@ interface Indexer {
   implementation: string;
   configContract: string;
   fields: Array<{ name: string; value: string | number | boolean }>;
-  enable: boolean;
+  enable?: boolean;
+  priority?: number;
 }
 
 /**
@@ -147,6 +148,7 @@ async function addIndexer(
     name: indexer.name,
     implementation: "Torznab",
     configContract: "TorznabSettings",
+    priority: 25,
     fields: [
       { name: "baseUrl", value: baseUrl },
       { name: "apiPath", value: "" },
@@ -154,8 +156,6 @@ async function addIndexer(
       { name: "categories", value: categories.join(",") },
       { name: "automaticSearch", value: true },
       { name: "interactiveSearch", value: true },
-      { name: "priority", value: 1 },
-      { name: "downloadClientId", value: "" },
     ],
     enable: true,
   };
