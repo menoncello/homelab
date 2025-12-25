@@ -1,6 +1,14 @@
 # Jackett to Arrs
 
-Add Jackett indexers to Sonarr and Radarr automatically via API.
+Sync all configured Jackett indexers to Sonarr and Radarr automatically via API.
+
+## Features
+
+- ✅ Reads all configured indexers directly from Jackett
+- ✅ Skips indexers that already exist
+- ✅ Only adds indexers that support the respective categories (TV/Movies)
+- ✅ Dry run mode for testing
+- ✅ No manual configuration needed
 
 ## Setup
 
@@ -9,57 +17,72 @@ Add Jackett indexers to Sonarr and Radarr automatically via API.
    - Radarr: Settings → General → API Key
 
 2. **Configure the script:**
-   Edit `add-indexers.ts` and add your API keys and indexers.
+   Edit `add-indexers.ts` and update the API keys (lines 17, 21).
 
-3. **Install dependencies (if needed):**
+3. **Install Bun (if needed):**
    ```bash
-   bun install
+   curl -fsSL https://bun.sh/install.sh | bash
    ```
 
 ## Usage
 
 ```bash
-bun run add-indexers.ts
+cd inner-projects/jackett-to-arrs
+
+# Test run (doesn't actually add)
+bun add-indexers.ts  # with dryRun: false
+
+# Or enable dryRun in CONFIG first to test
 ```
 
-## Indexer Configuration
+## How It Works
 
-Each indexer needs:
-- `name`: Display name
-- `implementation`: Usually "Torznab" for Jackett
-- `configContract`: Usually "TorznabSettings" for Jackett
-- `fields`: Configuration fields
-  - `baseUrl`: Your Jackett Torznab URL (e.g., `http://jackett:9117/api`)
-  - `categories`: Category IDs (auto-set for Sonarr/Radarr)
+1. Fetches all configured indexers from Jackett (`/api/v2.0/indexers?configured=true`)
+2. Checks which indexers already exist in Sonarr/Radarr
+3. Adds missing indexers automatically:
+   - Sonarr: Only adds indexers that support TV categories (8000, 8010, 8020, 8030)
+   - Radarr: Only adds indexers that support Movie categories (2000-2080)
+4. Skips semi-private and private indexers by default
 
-### Example Indexers
+## Configuration
+
+Edit the `CONFIG` object in `add-indexers.ts`:
 
 ```typescript
-const indexers = [
-  {
-    name: "TorrentDay",
-    implementation: "Torznab",
-    configContract: "TorznabSettings",
-    fields: [
-      { name: "baseUrl", value: "http://jackett:9117/torrentday" },
-      { name: "apiPath", value: "/api" },
-      { name: "automaticSearch", value: true },
-      { name: "interactiveSearch", value: true },
-      { name: "priority", value: 1 },
-    ],
+const CONFIG = {
+  jackett: {
+    url: "http://192.168.31.75:9117",  // Jackett URL
   },
-];
+  sonarr: {
+    url: "http://192.168.31.75:8989",    // Sonarr URL
+    apiKey: "YOUR_SONARR_API_KEY",
+  },
+  radarr: {
+    url: "http://192.168.31.75:7878",    // Radarr URL
+    apiKey: "YOUR_RADARR_API_KEY",
+  },
+  dryRun: false,  // Set true to test without adding
+};
 ```
 
-### Category IDs
+## Filtering Indexers
 
-**Sonarr (TV):** `8000,8010`
+The script includes filters to skip certain indexer types. You can modify these in `getJackettIndexers()`:
+
+```typescript
+.filter((i: any) => i.type !== "semi-private")  // Skip semi-private
+.filter((i: any) => !i.id.includes("zetorrents"))  // Skip specific indexer
+```
+
+## Category IDs
+
+**Sonarr (TV):**
 - 8000: TV Other
 - 8010: TV SD
 - 8020: TV HD
 - 8030: TV UHD
 
-**Radarr (Movies):** `2000,2010,2020,2030,2040,2050,2060,2070,2080`
+**Radarr (Movies):**
 - 2000: Movies Other
 - 2010: Movies SD
 - 2020: Movies HD
@@ -70,15 +93,31 @@ const indexers = [
 - 2070: Movies WEB-DL
 - 2080: Movies Foreign
 
-## Getting Jackett URLs
+## Example Output
 
-1. Open Jackett: http://192.168.31.75:9117
-2. Click "Show Torznab" next to your indexer
-3. Copy the URL (e.g., `http://192.168.31.75:9117/torrentday/api?passkey=xxx`)
-4. Use base path: `http://jackett:9117/torrentday`
+```
+🎬 Syncing Jackett indexers to Sonarr and Radarr...
+
+📡 Fetching indexers from Jackett...
+   Found 12 configured indexers
+
+📦 Processing: TorrentDay (torrentday)
+  ✅ Added "TorrentDay" to Sonarr
+  ✅ Added "TorrentDay" to Radarr
+
+📦 Processing: IPTorrents (iptorrents)
+  ⏭️  Already in Sonarr, skipping...
+  ⏭️  Already in Radarr, skipping...
+
+...
+
+✨ Done!
+   Sonarr: 5 new indexers added
+   Radarr: 7 new indexers added
+```
 
 ## Tips
 
-- The script skips indexers that already exist
-- You can run it multiple times safely
-- Indexers are added with `enable: true` by default
+- Run the script anytime you add new indexers in Jackett
+- Safe to run multiple times - skips existing indexers
+- Use `dryRun: true` first to see what would be added
