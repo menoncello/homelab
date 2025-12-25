@@ -4,7 +4,7 @@ Kavita is a fast, feature-rich, cross platform reading server. Built with the go
 
 ## Access
 
-- **URL:** http://192.168.31.208:5000
+- **URL:** http://192.168.31.75:5000
 - **Default credentials:** Create admin account on first launch
 
 ## Features
@@ -15,20 +15,20 @@ Kavita is a fast, feature-rich, cross platform reading server. Built with the go
 - **Collections** - Organize your library into collections
 - **OPDS Support** - Access your library from mobile apps
 - **Dark Mode** - Easy on the eyes
+- **Auto-Scan** - Automatically detects new books
 
 ## First Time Setup
 
 ```bash
-# 1. Create volume directories (on Xeon01)
-ssh eduardo@192.168.31.208
-sudo mkdir -p /srv/docker/kavita/config
-sudo mkdir -p /srv/docker/books
-sudo chown -R 1000:1000 /srv/docker/kavita
-sudo chown -R 1000:1000 /srv/docker/books
+# 1. Create volume directories (on Helios/pop-os)
+sudo mkdir -p /data/docker/kavita/config
+sudo mkdir -p /media/books
+sudo chown -R 1000:1000 /data/docker/kavita
+sudo chown -R 1000:1000 /media/books
 
-# 2. Deploy stack (from manager)
-cd ~/homelab/stacks/kavita-stack
-docker stack deploy -c docker-compose.yml kavita
+# 2. Deploy stack
+cd ~/homelab
+docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
 
 # 3. Verify deployment
 docker service ps kavita_kavita
@@ -40,15 +40,18 @@ docker service logs -f kavita_kavita
 After first launch:
 
 1. **Create admin account**
-2. **Add library:** Point to `/books` (already configured)
+2. **Add library:**
+   - Name: `Books`
+   - Path: `/books`
+   - Type: `Books`
 3. **Scan library:** Kavita will scan and organize your books
 4. **Configure users:** Create accounts for family members
 
 ## Adding Books
 
-Books can be added to `/srv/docker/books` on Xeon01:
-- Manual upload via SCP/SFTP
+Books can be added to `/media/books` on Helios:
 - From Stacks (Anna's Archive download manager)
+- Manual upload via SCP/SFTP
 - From Calibre library
 
 ## Supported Formats
@@ -60,6 +63,6 @@ Books can be added to `/srv/docker/books` on Xeon01:
 
 ## Tips
 
-- Kavita automatically scans the library folder
+- Kavita automatically scans the library folder for new books
 - Set up OPDS to access from mobile e-reader apps
 - Use collections to organize by genre/author/series

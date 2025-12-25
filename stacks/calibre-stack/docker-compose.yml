@@ -24,6 +24,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Sao_Paulo
+      - CALIBRE_OVERRIDE_DATABASE_PATH=/books/metadata.db
     volumes:
       - calibre-config:/config
       - calibre-books:/books
