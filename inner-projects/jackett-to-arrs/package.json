@@ -1,0 +1,12 @@
+{
+  "name": "jackett-to-arrs",
+  "version": "1.0.0",
+  "description": "Add Jackett indexers to Sonarr and Radarr",
+  "type": "module",
+  "scripts": {
+    "add-indexers": "bun add-indexers.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
