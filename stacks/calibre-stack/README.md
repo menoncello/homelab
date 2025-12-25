@@ -1,6 +1,6 @@
-# Calibre-Web Stack
+# Calibre-Web Automated Stack
 
-Calibre-Web is a web app providing a clean interface for browsing, reading and downloading eBooks stored in a Calibre database.
+All-in-one ebook manager with Anna's Archive integration. Search, download, and read books in one place.
 
 ## Access
 
@@ -11,13 +11,12 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 ## Features
 
-- **Browse** - Browse your Calibre library by cover, list, or grid view
-- **Read** - Read eBooks in the browser (EPUB, PDF, TXT)
-- **Download** - Download eBooks in any format
-- **Upload** - Upload new eBooks to the library
-- **Edit Metadata** - Edit title, author, cover, etc.
+- **Anna's Archive Search** - Built-in search and download from Anna's Archive
+- **Auto Cloudflare Bypass** - No need for FlareSolverr
+- **Browse & Read** - Read EPUB, PDF in browser
+- **Library Management** - Organize by author, series, tags
 - **OPDS** - Access from mobile e-reader apps
-- **Auto-import** - Automatically imports books from Stacks downloads
+- **Auto-Import** - Automatically imports downloaded books
 
 ## First Time Setup
 
@@ -29,10 +28,10 @@ sudo mkdir -p /srv/docker/books
 sudo chown -R 1000:1000 /srv/docker/calibre
 sudo chown -R 1000:1000 /srv/docker/books
 
-# 2. Remove Kavita stack (from manager)
-docker stack rm kavita
+# 2. Remove Kavita and Stacks stacks (from manager)
+docker stack rm kavita stacks
 
-# 3. Deploy Calibre-Web stack
+# 3. Deploy Calibre-Web Automated stack
 cd ~/homelab
 docker stack deploy -c stacks/calibre-stack/docker-compose.yml calibre
 
@@ -46,32 +45,38 @@ docker service logs -f calibre_calibre
 ### First Launch
 
 1. Access http://192.168.31.208:8083
-2. Click "Obstacle Course" to set admin password
-3. Specify Calibre settings (database location)
-4. Set `Path to Books` to `/books`
+2. Default login: `admin` / `admin123`
+3. Click **"Basic Configuration"** → **"Feature Configuration"**
+4. Enable **"Automated Download"**
+5. Configure Anna's Archive settings (add donation key for faster downloads)
 
-### Adding Books from Stacks
+### Searching & Downloading
 
-Books downloaded by Stacks appear in `/books` automatically:
-1. Click **Add Books** → **Import from Folder**
-2. Select `/books`
-3. Books are automatically detected and added to library
+1. Click **"Download Books"** in the menu
+2. Search by title, author, or ISBN
+3. Select source (Anna's Archive, LibGen, etc.)
+4. Click **"Download"** - book is added to library automatically
 
-### Auto-Import
+### Existing Books
 
-The `calibre-web-automated` mod automatically:
-- Scans `/books` for new files
-- Imports them to the Calibre database
-- Downloads metadata and covers
+Books already in `/srv/docker/books` will be auto-imported:
+1. Go to **"Admin"** → **"Configuration"** → **"Edit Metadata"**
+2. Click **"Import from Folder"**
+3. Select `/books` and click **"Import"**
 
-## Integration with Stacks
+## Anna's Archive Integration
 
-Stacks downloads to `/srv/docker/books` - Calibre-Web reads from the same folder!
+### For Better Performance (Optional)
 
-1. Download book via Stacks
-2. Book appears in `/srv/docker/books/`
-3. Calibre-Web auto-imports on next scan
-4. Book appears in your library
+If you have an Anna's Archive donation key:
+1. Go to **"Download Books"** → **"Settings"**
+2. Add your donation key in **"Anna's Archive Key"**
+3. This enables faster, more reliable downloads
+
+### Without Donation Key
+
+- Still works, but uses slower mirrors
+- May encounter Cloudflare challenges (auto-bypassed)
 
 ## Mobile Access
 
@@ -82,6 +87,7 @@ Calibre-Web supports OPDS - add to your mobile e-reader app:
 ## Tips
 
 - Change default password immediately
-- Enable "Enable Upload" in settings to add books
+- Books are stored in `/srv/docker/books/`
+- Database is in `/srv/docker/calibre/config/`
 - Use OPDS for mobile reading
-- Calibre-Web can convert formats on-the-fly
+- Supports EPUB, PDF, MOBI, AZW3, CBZ, CBR
