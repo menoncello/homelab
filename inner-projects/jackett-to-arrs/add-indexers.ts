@@ -4,8 +4,8 @@
  *
  * Usage: bun add-indexers.ts
  *
- * Automatically reads all configured indexers from Jackett
- * and adds them to Sonarr and Radarr.
+ * Reads indexer IDs from INDEXER_LIST environment variable
+ * and adds them to Sonarr and Radarr using Jackett's Torznab endpoint.
  */
 
 // Load environment variables from .env
@@ -16,7 +16,6 @@ config();
 const CONFIG = {
   jackett: {
     url: process.env.JACKETT_URL || "http://192.168.31.75:9117",
-    apiKey: process.env.JACKETT_API_KEY || "",
   },
   sonarr: {
     url: process.env.SONARR_URL || "http://192.168.31.75:8989",
@@ -30,14 +29,27 @@ const CONFIG = {
   dryRun: process.env.DRY_RUN === "true",
 };
 
-interface JackettIndexer {
+// Parse indexer list from environment (comma-separated: id1:id2:name1,id2:id3:name2,...)
+// or use defaults. Format: indexerId:torznabCapsId:displayname
+function getIndexerList(): Array<{ id: string; name: string; capsUrl: string }> {
+  const envList = process.env.INDEXER_LIST;
+  if (envList) {
+    return envList.split(",").map((item) => {
+      const parts = item.trim().split(":");
+      if (parts.length >= 2) {
+        return { id: parts[0], name: parts[1] || parts[0], capsUrl: parts[0] };
+      }
+      return { id: parts[0], name: parts[0], capsUrl: parts[0] };
+    });
+  }
+
+  // Fallback: return empty and require user to specify
+  return [];
+}
+
+interface IndexerDef {
   id: string;
   name: string;
-  type: string;
-  link: string;
-  caps: {
-    categories: Array<{ id: number; name: string }>;
-  };
 }
 
 interface Service {
@@ -51,45 +63,13 @@ interface Indexer {
   implementation: string;
   configContract: string;
   fields: Array<{ name: string; value: string | number | boolean }>;
-}
-
-async function getJackettIndexers(): Promise<JackettIndexer[]> {
-  const url = `${CONFIG.jackett.url}/api/v2.0/indexers?configured=true`;
-
-  try {
-    const headers: HeadersInit = {};
-    if (CONFIG.jackett.apiKey) {
-      headers["X-Api-Key"] = CONFIG.jackett.apiKey;
-    }
-
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(`Jackett API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    // Filter out Jackett built-in indexers
-    return Object.values(data)
-      .filter((i: any) => i.type !== "semi-private" && i.type !== "private")
-      .filter((i: any) => !i.id.includes("zetorrents"))
-      .map((i: any) => ({
-        id: i.id,
-        name: i.name,
-        type: i.type,
-        link: i.link,
-        caps: i.caps,
-      }));
-  } catch (error) {
-    console.error("❌ Error fetching Jackett indexers:", error);
-    return [];
-  }
+  enable: boolean;
 }
 
 async function addIndexer(
   service: Service,
-  indexer: JackettIndexer,
-  categories: string
+  indexer: IndexerDef,
+  categories: number[]
 ): Promise<boolean> {
   const url = `${service.url}/api/v3/indexer`;
 
@@ -104,7 +84,7 @@ async function addIndexer(
       { name: "baseUrl", value: baseUrl },
       { name: "apiPath", value: "" },
       { name: "apiKey", value: "" },
-      { name: "categories", value: categories },
+      { name: "categories", value: categories.join(",") },
       { name: "automaticSearch", value: true },
       { name: "interactiveSearch", value: true },
       { name: "priority", value: 1 },
@@ -116,6 +96,7 @@ async function addIndexer(
   if (CONFIG.dryRun) {
     console.log(`  🧪 [DRY RUN] Would add "${indexer.name}" to ${service.name}`);
     console.log(`     Base URL: ${baseUrl}`);
+    console.log(`     Categories: ${categories.join(",")}`);
     return true;
   }
 
@@ -161,12 +142,6 @@ async function getExistingIndexers(service: Service): Promise<any[]> {
   }
 }
 
-function indexerSupportsCategory(indexer: JackettIndexer, categoryIds: number[]): boolean {
-  if (!indexer.caps?.categories) return false;
-  const indexerCatIds = indexer.caps.categories.map((c) => c.id);
-  return categoryIds.some((id) => indexerCatIds.includes(id));
-}
-
 async function main() {
   console.log("🎬 Syncing Jackett indexers to Sonarr and Radarr...\n");
 
@@ -175,20 +150,31 @@ async function main() {
     console.error("❌ Missing API keys! Please set them in .env file:");
     console.error("   SONARR_API_KEY=xxx");
     console.error("   RADARR_API_KEY=xxx");
-    console.error("   JACKETT_API_KEY=xxx (optional)");
     process.exit(1);
   }
 
-  // Get Jackett indexers
-  console.log("📡 Fetching indexers from Jackett...");
-  const jackettIndexers = await getJackettIndexers();
+  // Get indexer list from environment
+  const indexers = getIndexerList();
 
-  if (jackettIndexers.length === 0) {
-    console.error("❌ No indexers found in Jackett!");
+  if (indexers.length === 0) {
+    console.error("❌ No indexers configured!");
+    console.error("");
+    console.error("To use this script, add your Jackett indexer IDs to .env:");
+    console.error("");
+    console.error("  INDEXER_LIST=indexer-id-1:Display Name 1,indexer-id-2:Display Name 2,...");
+    console.error("");
+    console.error("To find your indexer IDs:");
+    console.error("  1. Open Jackett web UI");
+    console.error("  2. Click on an indexer");
+    console.error("  3. The URL shows the indexer ID (e.g., /UI/Dashboard#indexer=torrentday)");
+    console.error("  4. Use 'torrentday' as the ID");
+    console.error("");
+    console.error("Example:");
+    console.error("  INDEXER_LIST=torrentday:TorrentDay,iptorrents:IPTorrents,limetorrents:LimeTorrents");
     process.exit(1);
   }
 
-  console.log(`   Found ${jackettIndexers.length} configured indexers\n`);
+  console.log(`📡 Found ${indexers.length} indexers to process\n`);
 
   // Get existing indexers to avoid duplicates
   const sonarrIndexers = await getExistingIndexers(CONFIG.sonarr);
@@ -204,20 +190,18 @@ async function main() {
   let addedToSonarr = 0;
   let addedToRadarr = 0;
 
-  for (const indexer of jackettIndexers) {
+  for (const indexer of indexers) {
     console.log(`\n📦 Processing: ${indexer.name} (${indexer.id})`);
 
     // Sonarr (TV)
     const sonarrExists = sonarrNames.has(indexer.name);
     if (sonarrExists) {
       console.log(`  ⏭️  Already in Sonarr, skipping...`);
-    } else if (!indexerSupportsCategory(indexer, tvCategories)) {
-      console.log(`  ⏭️  Doesn't support TV categories, skipping Sonarr...`);
     } else {
       const added = await addIndexer(
         { ...CONFIG.sonarr, name: "Sonarr" },
         indexer,
-        tvCategories.join(",")
+        tvCategories
       );
       if (added) addedToSonarr++;
     }
@@ -226,13 +210,11 @@ async function main() {
     const radarrExists = radarrNames.has(indexer.name);
     if (radarrExists) {
       console.log(`  ⏭️  Already in Radarr, skipping...`);
-    } else if (!indexerSupportsCategory(indexer, movieCategories)) {
-      console.log(`  ⏭️  Doesn't support Movie categories, skipping Radarr...`);
     } else {
       const added = await addIndexer(
         { ...CONFIG.radarr, name: "Radarr" },
         indexer,
-        movieCategories.join(",")
+        movieCategories
       );
       if (added) addedToRadarr++;
     }

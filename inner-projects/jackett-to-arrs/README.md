@@ -1,15 +1,15 @@
 # Jackett to Arrs
 
-Sync all configured Jackett indexers to Sonarr and Radarr automatically via API.
+Add Jackett indexers to Sonarr and Radarr automatically via API.
 
 ## Features
 
-- ✅ Reads all configured indexers directly from Jackett
+- ✅ Adds indexers to Sonarr and Radarr via Torznab
 - ✅ Skips indexers that already exist
-- ✅ Only adds indexers that support the respective categories (TV/Movies)
+- ✅ Adds appropriate categories for TV (Sonarr) and Movies (Radarr)
 - ✅ Dry run mode for testing
 - ✅ Environment variables via `.env` file
-- ✅ No manual configuration needed
+- ✅ No Jackett admin API access required
 
 ## Setup
 
@@ -28,10 +28,10 @@ Sync all configured Jackett indexers to Sonarr and Radarr automatically via API.
    cp .env.example .env
    ```
 
-4. **Edit `.env` and add your API keys:**
+4. **Edit `.env` and add your API keys and indexer list:**
    ```env
    JACKETT_URL=http://192.168.31.75:9117
-   JACKETT_API_KEY=your_jackett_api_key_here
+   INDEXER_LIST=torrentday:TorrentDay,iptorrents:IPTorrents,limetorrents:LimeTorrents
 
    SONARR_URL=http://192.168.31.75:8989
    SONARR_API_KEY=your_sonarr_api_key_here
@@ -44,7 +44,19 @@ Sync all configured Jackett indexers to Sonarr and Radarr automatically via API.
 
 - **Sonarr:** Settings → General → API Key
 - **Radarr:** Settings → General → API Key
-- **Jackett:** Settings → API (optional for local access)
+
+## Finding Indexer IDs
+
+To find your Jackett indexer IDs:
+
+1. Open Jackett web UI
+2. Click on an indexer
+3. Look at the URL: `http://jackett-url/UI/Dashboard#indexer=xyz`
+4. The `xyz` part is your indexer ID
+
+For example, if the URL is `http://192.168.31.75:9117/UI/Dashboard#indexer=torrentday`, then:
+- Indexer ID: `torrentday`
+- Display Name: `TorrentDay` (or any name you prefer)
 
 ## Usage
 
@@ -60,12 +72,11 @@ DRY_RUN=true bun run add-indexers
 
 ## How It Works
 
-1. Fetches all configured indexers from Jackett (`/api/v2.0/indexers?configured=true`)
+1. Reads indexer list from `INDEXER_LIST` environment variable
 2. Checks which indexers already exist in Sonarr/Radarr
-3. Adds missing indexers automatically:
-   - Sonarr: Only adds indexers that support TV categories (8000, 8010, 8020, 8030)
-   - Radarr: Only adds indexers that support Movie categories (2000-2080)
-4. Skips semi-private and private indexers by default
+3. Adds missing indexers automatically using Jackett's Torznab endpoint:
+   - Sonarr: Adds with TV categories (8000, 8010, 8020, 8030)
+   - Radarr: Adds with Movie categories (2000-2080)
 
 ## Configuration
 
@@ -74,21 +85,23 @@ All configuration is done via environment variables in `.env`:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `JACKETT_URL` | No | `http://192.168.31.75:9117` | Jackett URL |
-| `JACKETT_API_KEY` | No | - | Jackett API key (optional for local) |
+| `INDEXER_LIST` | Yes | - | Comma-separated `id:Name` pairs |
 | `SONARR_URL` | No | `http://192.168.31.75:8989` | Sonarr URL |
 | `SONARR_API_KEY` | Yes | - | Sonarr API key |
 | `RADARR_URL` | No | `http://192.168.31.75:7878` | Radarr URL |
 | `RADARR_API_KEY` | Yes | - | Radarr API key |
 | `DRY_RUN` | No | `false` | Test without adding |
 
-## Filtering Indexers
+### INDEXER_LIST Format
 
-The script includes filters to skip certain indexer types. Modify `getJackettIndexers()` in `add-indexers.ts`:
-
-```typescript
-.filter((i: any) => i.type !== "semi-private")  // Skip semi-private
-.filter((i: any) => !i.id.includes("zetorrents"))  // Skip specific indexer
 ```
+INDEXER_LIST=id1:Display Name 1,id2:Display Name 2,id3:Display Name 3
+```
+
+Examples:
+- Single indexer: `INDEXER_LIST=torrentday:TorrentDay`
+- Multiple indexers: `INDEXER_LIST=torrentday:TorrentDay,iptorrents:IPTorrents,limetorrents:LimeTorrents`
+- ID only (name same as ID): `INDEXER_LIST=torrentday,iptorrents`
 
 ## Category IDs
 
@@ -114,8 +127,7 @@ The script includes filters to skip certain indexer types. Modify `getJackettInd
 ```
 🎬 Syncing Jackett indexers to Sonarr and Radarr...
 
-📡 Fetching indexers from Jackett...
-   Found 12 configured indexers
+📡 Found 3 indexers to process
 
 📦 Processing: TorrentDay (torrentday)
   ✅ Added "TorrentDay" to Sonarr
@@ -125,11 +137,13 @@ The script includes filters to skip certain indexer types. Modify `getJackettInd
   ⏭️  Already in Sonarr, skipping...
   ⏭️  Already in Radarr, skipping...
 
-...
+📦 Processing: LimeTorrents (limetorrents)
+  ✅ Added "LimeTorrents" to Sonarr
+  ✅ Added "LimeTorrents" to Radarr
 
 ✨ Done!
-   Sonarr: 5 new indexers added
-   Radarr: 7 new indexers added
+   Sonarr: 2 new indexers added
+   Radarr: 2 new indexers added
 ```
 
 ## Tips
@@ -138,3 +152,4 @@ The script includes filters to skip certain indexer types. Modify `getJackettInd
 - Safe to run multiple times - skips existing indexers
 - Use `DRY_RUN=true` to test before actually adding
 - The `.env` file is git-ignored for security
+- You don't need Jackett admin API access or API keys
