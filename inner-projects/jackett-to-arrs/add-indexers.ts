@@ -8,20 +8,26 @@
  * and adds them to Sonarr and Radarr.
  */
 
+// Load environment variables from .env
+import { config } from "dotenv";
+
+config();
+
 const CONFIG = {
   jackett: {
-    url: "http://192.168.31.75:9117",
+    url: process.env.JACKETT_URL || "http://192.168.31.75:9117",
+    apiKey: process.env.JACKETT_API_KEY || "",
   },
   sonarr: {
-    url: "http://192.168.31.75:8989",
-    apiKey: "b13994d5951647e387a696bb392c1166",
+    url: process.env.SONARR_URL || "http://192.168.31.75:8989",
+    apiKey: process.env.SONARR_API_KEY || "",
   },
   radarr: {
-    url: "http://192.168.31.75:7878",
-    apiKey: "7d84f5f3ac3445978ea8b16faf9f1ae9",
+    url: process.env.RADARR_URL || "http://192.168.31.75:7878",
+    apiKey: process.env.RADARR_API_KEY || "",
   },
   // Set to true to test without actually adding
-  dryRun: false,
+  dryRun: process.env.DRY_RUN === "true",
 };
 
 interface JackettIndexer {
@@ -51,21 +57,22 @@ async function getJackettIndexers(): Promise<JackettIndexer[]> {
   const url = `${CONFIG.jackett.url}/api/v2.0/indexers?configured=true`;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        "X-Api-Key": "YOUR_JACKETT_API_KEY", // Jackett usually doesn't require API key for local
-      },
-    });
+    const headers: HeadersInit = {};
+    if (CONFIG.jackett.apiKey) {
+      headers["X-Api-Key"] = CONFIG.jackett.apiKey;
+    }
+
+    const response = await fetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`Jackett API error: ${response.status}`);
     }
 
     const data = await response.json();
-    // Filter out Jackett built-in indexers (indexers that start with the indexer name)
+    // Filter out Jackett built-in indexers
     return Object.values(data)
       .filter((i: any) => i.type !== "semi-private" && i.type !== "private")
-      .filter((i: any) => !i.id.includes("zetorrents")) // Example: skip specific indexers
+      .filter((i: any) => !i.id.includes("zetorrents"))
       .map((i: any) => ({
         id: i.id,
         name: i.name,
@@ -86,8 +93,7 @@ async function addIndexer(
 ): Promise<boolean> {
   const url = `${service.url}/api/v3/indexer`;
 
-  // Get the Torznab URL from Jackett
-  // Format: http://jackett:9117/api/{indexer_id}?passkey=xxx
+  // Torznab URL from Jackett
   const baseUrl = `${CONFIG.jackett.url}/api/${indexer.id}`;
 
   const payload: Indexer = {
@@ -96,12 +102,12 @@ async function addIndexer(
     configContract: "TorznabSettings",
     fields: [
       { name: "baseUrl", value: baseUrl },
-      { name: "apiPath", value: "" }, // Empty for Jackett
+      { name: "apiPath", value: "" },
       { name: "apiKey", value: "" },
       { name: "categories", value: categories },
       { name: "automaticSearch", value: true },
       { name: "interactiveSearch", value: true },
-      { name: "priority", value: 1 }, // Lower = higher priority
+      { name: "priority", value: 1 },
       { name: "downloadClientId", value: "" },
     ],
     enable: true,
@@ -163,6 +169,15 @@ function indexerSupportsCategory(indexer: JackettIndexer, categoryIds: number[])
 
 async function main() {
   console.log("🎬 Syncing Jackett indexers to Sonarr and Radarr...\n");
+
+  // Validate API keys
+  if (!CONFIG.sonarr.apiKey || !CONFIG.radarr.apiKey) {
+    console.error("❌ Missing API keys! Please set them in .env file:");
+    console.error("   SONARR_API_KEY=xxx");
+    console.error("   RADARR_API_KEY=xxx");
+    console.error("   JACKETT_API_KEY=xxx (optional)");
+    process.exit(1);
+  }
 
   // Get Jackett indexers
   console.log("📡 Fetching indexers from Jackett...");
