@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "add-indexers": "bun add-indexers.ts",
-    "export-indexers": "bun export-indexers.ts"
+    "export-indexers": "bun export-indexers.ts",
+    "list-audiobook": "bun list-audiobook-indexers.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
