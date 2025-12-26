@@ -178,6 +178,15 @@ async function main() {
     process.exit(1);
   }
 
+  // Debug: Show a sample indexer with categories
+  const sampleIndexer = jackettIndexers[0];
+  console.log(`\n📋 Sample indexer data:`);
+  console.log(`   Name: ${sampleIndexer.name}`);
+  console.log(`   Has caps: ${!!sampleIndexer.caps}`);
+  if (sampleIndexer.caps?.categories) {
+    console.log(`   Categories: ${JSON.stringify(sampleIndexer.caps.categories.slice(0, 5))}...`);
+  }
+
   // Get Jackett API key
   const apiKey = await getJackettApiKey();
 
