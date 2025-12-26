@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /**
  * List Jackett indexers that support audiobooks (category 8040)
+ * Fetches categories from each indexer's config endpoint
  */
 
 import { config } from "dotenv";
@@ -15,6 +16,10 @@ interface JackettIndexer {
   name: string;
   type: string;
   link: string;
+  configured?: boolean;
+}
+
+interface IndexerConfig {
   caps?: {
     categories: Array<{ id: number; name: string }>;
   };
@@ -54,10 +59,25 @@ async function getIndexers(cookies: string): Promise<JackettIndexer[]> {
   return Object.values(data);
 }
 
-function supportsAudiobooks(indexer: JackettIndexer): boolean {
-  if (!indexer.caps?.categories) return false;
-  const catIds = indexer.caps.categories.map((c) => c.id);
-  return catIds.includes(8040);
+async function getIndexerConfig(indexerId: string, cookies: string): Promise<IndexerConfig> {
+  try {
+    const response = await fetch(`${JACKETT_URL}/api/v2.0/indexers/${indexerId}/config`, {
+      headers: { "Cookie": cookies },
+    });
+
+    if (!response.ok) {
+      return {};
+    }
+
+    return await response.json();
+  } catch {
+    return {};
+  }
+}
+
+function supportsAudiobooks(categories: number[] | undefined): boolean {
+  if (!categories) return false;
+  return categories.includes(8040);
 }
 
 async function main() {
@@ -65,19 +85,38 @@ async function main() {
   console.log("📡 Fetching indexers...\n");
 
   const indexers = await getIndexers(cookies);
+  console.log(`   Found ${indexers.length} total indexers\n`);
 
-  // Filter for audiobook support
-  const audiobookIndexers = indexers.filter(supportsAudiobooks);
+  const audiobookIndexers: Array<{
+    name: string;
+    id: string;
+    categories: number[];
+    torznab: string;
+    link: string;
+  }> = [];
+
+  // Fetch config for each indexer
+  for (const idx of indexers) {
+    const config = await getIndexerConfig(idx.id, cookies);
+    const categories = config.caps?.categories?.map((c) => c.id) || [];
+
+    if (supportsAudiobooks(categories)) {
+      audiobookIndexers.push({
+        name: idx.name,
+        id: idx.id,
+        categories,
+        torznab: `${JACKETT_URL}/api/${idx.id}`,
+        link: idx.link,
+      });
+    }
+  }
 
   console.log(`✅ Found ${audiobookIndexers.length} indexers with Audiobook support (8040):\n`);
 
   audiobookIndexers.forEach((idx) => {
-    const cats = idx.caps?.categories || [];
-    const allCats = cats.map((c) => c.id).join(",");
-
     console.log(`📚 ${idx.name} (${idx.id})`);
-    console.log(`   Categories: ${allCats}`);
-    console.log(`   Torznab: ${JACKETT_URL}/api/${idx.id}`);
+    console.log(`   Categories: ${idx.categories.join(",")}`);
+    console.log(`   Torznab: ${idx.torznab}`);
     console.log(`   Link: ${idx.link}`);
     console.log("");
   });
@@ -85,9 +124,8 @@ async function main() {
   // Generate TSV for audiobook indexers
   const tsvHeader = "Name\tTorznab Feed URL\tCategories\tAPI Key\n";
   const tsvRows = audiobookIndexers.map((idx) => {
-    const torznabUrl = `${JACKETT_URL}/api/${idx.id}`;
-    const cats = idx.caps?.categories?.map((c) => c.id).join(",") || "";
-    return `${idx.name}\t${torznabUrl}\t${cats}\tYOUR_API_KEY`;
+    const cats = idx.categories.join(",");
+    return `${idx.name}\t${idx.torznab}\t${cats}\tYOUR_JACKETT_API_KEY`;
   }).join("\n");
 
   await Bun.write("audiobook-indexers.tsv", tsvHeader + tsvRows);
