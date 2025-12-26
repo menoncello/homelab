@@ -62,11 +62,31 @@ interface Indexer {
 
 /**
  * Get CSRF token from *arr applications that require it
- * Uses Puppeteer to access the web UI and extract the token
+ * First tries API endpoint, then falls back to Puppeteer for web UI
  */
 async function getCsrfToken(service: Service): Promise<{ token: string | null; cookies: string }> {
+  // First try to get CSRF from API endpoint (faster)
   try {
-    console.log(`  🔐 Getting CSRF token from ${service.name}...`);
+    const response = await fetch(`${service.url}/api/v3/indexer/schema`, {
+      headers: {
+        "X-Api-Key": service.apiKey,
+      },
+    });
+
+    const csrfFromHeader = response.headers.get("X-CSRF-Token");
+    const setCookie = response.headers.get("Set-Cookie");
+
+    if (csrfFromHeader) {
+      console.log(`  ✅ Got CSRF token from API header`);
+      return { token: csrfFromHeader, cookies: setCookie || "" };
+    }
+  } catch {
+    // Fall through to Puppeteer approach
+  }
+
+  // Fallback: Use Puppeteer to access the web UI
+  try {
+    console.log(`  🔐 Getting CSRF token from ${service.name} web UI...`);
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -75,6 +95,20 @@ async function getCsrfToken(service: Service): Promise<{ token: string | null; c
 
     try {
       const page = await browser.newPage();
+
+      // Enable request interception to capture response headers
+      await page.setRequestInterception(true);
+      let csrfFromHeader: string | null = null;
+
+      page.on('response', (response) => {
+        const headers = response.headers();
+        // Try different header names
+        csrfFromHeader = csrfFromHeader ||
+          headers['x-csrf-token'] ||
+          headers['x-xsrf-token'] ||
+          headers['csrf-token'];
+      });
+
       await page.goto(service.url, {
         waitUntil: "networkidle2",
         timeout: 30000,
@@ -94,6 +128,11 @@ async function getCsrfToken(service: Service): Promise<{ token: string | null; c
           return metaTag.getAttribute('content');
         }
 
+        // Check for antiForgery token in window
+        if ((window as any).antiForgeryToken) {
+          return (window as any).antiForgeryToken;
+        }
+
         // Check for API key in window object
         if ((window as any).apiKey) {
           return (window as any).apiKey;
@@ -105,18 +144,27 @@ async function getCsrfToken(service: Service): Promise<{ token: string | null; c
           return localCsrf;
         }
 
+        // Check for __RequestVerificationToken in hidden inputs
+        const input = document.querySelector('input[name="__RequestVerificationToken"]') as HTMLInputElement;
+        if (input) {
+          return input.value;
+        }
+
         return null;
       });
 
       await browser.close();
 
-      if (csrfToken) {
+      // Use header CSRF token if found, otherwise use page token
+      const finalToken = csrfFromHeader || csrfToken;
+
+      if (finalToken) {
         console.log(`     ✅ Got CSRF token`);
       } else {
         console.log(`     ⚠️  No CSRF token found, will try with cookies only`);
       }
 
-      return { token: csrfToken, cookies: cookieHeader };
+      return { token: finalToken, cookies: cookieHeader };
     } catch (error) {
       await browser.close();
       throw error;
@@ -240,35 +288,71 @@ async function addIndexer(
 
   try {
     const headers: Record<string, string> = {
-      "X-Api-Key": service.apiKey,
       "Content-Type": "application/json",
     };
 
+    // Try multiple approaches for authentication
+    const attempts = [
+      // Attempt 1: X-Api-Key header (standard)
+      async () => {
+        headers["X-Api-Key"] = service.apiKey;
+        return null;
+      },
+      // Attempt 2: With API key as query parameter
+      async () => {
+        const urlWithKey = `${url}?apiKey=${encodeURIComponent(service.apiKey)}`;
+        delete headers["X-Api-Key"];
+        return urlWithKey;
+      },
+      // Attempt 3: Authorization header with Bearer
+      async () => {
+        delete headers["X-Api-Key"];
+        headers["Authorization"] = `Bearer ${service.apiKey}`;
+        return null;
+      },
+    ];
+
     // Add CSRF token and cookies if required
+    let { token, cookies } = { token: null as string | null, cookies: "" };
     if (service.requiresCsrf) {
-      const { token, cookies } = await getCsrfToken(service);
-      if (cookies) {
-        headers["Cookie"] = cookies;
-      }
-      if (token) {
-        headers["X-CSRF-Token"] = token;
+      const result = await getCsrfToken(service);
+      token = result.token;
+      cookies = result.cookies;
+    }
+
+    if (cookies) {
+      headers["Cookie"] = cookies;
+    }
+    if (token) {
+      headers["X-CSRF-Token"] = token;
+    }
+
+    let lastError = "";
+    for (const attempt of attempts) {
+      const altUrl = await attempt();
+      const targetUrl = altUrl || url;
+
+      try {
+        const response = await fetch(targetUrl, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          console.log(`  ✅ Added "${indexer.name}" to ${service.name}`);
+          return true;
+        }
+
+        const error = await response.text();
+        lastError = error;
+      } catch (e) {
+        lastError = String(e);
       }
     }
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error(`  ❌ Error adding to ${service.name}: ${error}`);
-      return false;
-    }
-
-    console.log(`  ✅ Added "${indexer.name}" to ${service.name}`);
-    return true;
+    console.error(`  ❌ Error adding to ${service.name}: ${lastError}`);
+    return false;
   } catch (error) {
     console.error(`  ❌ Error adding to ${service.name}:`, error);
     return false;
