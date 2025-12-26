@@ -48,6 +48,7 @@ interface Service {
   url: string;
   apiKey: string;
   name: string;
+  requiresCsrf?: boolean;
 }
 
 interface Indexer {
@@ -57,6 +58,72 @@ interface Indexer {
   fields: Array<{ name: string; value: string | number | boolean }>;
   enable?: boolean;
   priority?: number;
+}
+
+/**
+ * Get CSRF token from *arr applications that require it
+ * Uses Puppeteer to access the web UI and extract the token
+ */
+async function getCsrfToken(service: Service): Promise<{ token: string | null; cookies: string }> {
+  try {
+    console.log(`  🔐 Getting CSRF token from ${service.name}...`);
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    try {
+      const page = await browser.newPage();
+      await page.goto(service.url, {
+        waitUntil: "networkidle2",
+        timeout: 30000,
+      });
+
+      // Get cookies
+      const cookies = await page.cookies();
+      const cookieHeader = cookies
+        .map((c) => `${c.name}=${c.value}`)
+        .join("; ");
+
+      // Try to get CSRF token from page
+      const csrfToken = await page.evaluate(() => {
+        // Check for common CSRF token locations
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+          return metaTag.getAttribute('content');
+        }
+
+        // Check for API key in window object
+        if ((window as any).apiKey) {
+          return (window as any).apiKey;
+        }
+
+        // Check for CSRF in localStorage
+        const localCsrf = localStorage.getItem('csrfToken') || localStorage.getItem('X-CSRF-Token');
+        if (localCsrf) {
+          return localCsrf;
+        }
+
+        return null;
+      });
+
+      await browser.close();
+
+      if (csrfToken) {
+        console.log(`     ✅ Got CSRF token`);
+      } else {
+        console.log(`     ⚠️  No CSRF token found, will try with cookies only`);
+      }
+
+      return { token: csrfToken, cookies: cookieHeader };
+    } catch (error) {
+      await browser.close();
+      throw error;
+    }
+  } catch {
+    return { token: null, cookies: "" };
+  }
 }
 
 /**
@@ -172,12 +239,25 @@ async function addIndexer(
   }
 
   try {
+    const headers: Record<string, string> = {
+      "X-Api-Key": service.apiKey,
+      "Content-Type": "application/json",
+    };
+
+    // Add CSRF token and cookies if required
+    if (service.requiresCsrf) {
+      const { token, cookies } = await getCsrfToken(service);
+      if (cookies) {
+        headers["Cookie"] = cookies;
+      }
+      if (token) {
+        headers["X-CSRF-Token"] = token;
+      }
+    }
+
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "X-Api-Key": service.apiKey,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -311,7 +391,7 @@ async function main() {
         console.log(`  ⏭️  Doesn't support Book categories, skipping Listenarr...`);
       } else {
         const added = await addIndexer(
-          { ...CONFIG.listenarr, name: "Listenarr" },
+          { ...CONFIG.listenarr, name: "Listenarr", requiresCsrf: true },
           indexer,
           bookCategories
         );
