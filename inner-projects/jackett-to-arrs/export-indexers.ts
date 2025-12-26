@@ -7,7 +7,8 @@
  * Generates: indexers.tsv with columns:
  * - Name
  * - Torznab Feed URL
- * - Jackett API Key
+ * - Categories (comma-separated IDs)
+ * - API Key
  */
 
 import { config } from "dotenv";
@@ -181,10 +182,13 @@ async function main() {
   const apiKey = await getJackettApiKey();
 
   // Generate TSV content
-  const tsvHeader = "Name\tTorznab Feed URL\tAPI Key\n";
+  const tsvHeader = "Name\tTorznab Feed URL\tCategories\tAPI Key\n";
   const tsvRows = jackettIndexers.map((indexer) => {
     const torznabUrl = `${CONFIG.jackett.url}/api/${indexer.id}`;
-    return `${indexer.name}\t${torznabUrl}\t${apiKey}`;
+    const categories = indexer.caps?.categories
+      ? indexer.caps.categories.map((c) => c.id).join(",")
+      : "";
+    return `${indexer.name}\t${torznabUrl}\t${categories}\t${apiKey}`;
   }).join("\n");
 
   const tsvContent = tsvHeader + tsvRows;
@@ -194,7 +198,7 @@ async function main() {
   await Bun.write(filename, tsvContent);
 
   console.log(`\n✅ Exported ${jackettIndexers.length} indexers to ${filename}`);
-  console.log(`\n📋 Format: Name | Torznab Feed URL | API Key`);
+  console.log(`\n📋 Format: Name | Torznab Feed URL | Categories | API Key`);
   console.log(`\n💡 You can import this TSV into:`);
   console.log(`   - Listenarr (Settings → Indexers → Import)`);
   console.log(`   - Readarr (Settings → Indexers → Import)`);
