@@ -37,7 +37,7 @@ services:
       - homelab-net
     ports:
       - target: 5000
-        published: 5000
+        published: 8988
         protocol: tcp
         mode: host
     healthcheck:
