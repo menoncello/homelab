@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 /**
- * Add Jackett indexers to Sonarr and Radarr via API
+ * Add Jackett indexers to Sonarr, Radarr, and Listenarr via API
  *
  * Usage: bun add-indexers.ts
  *
  * Uses Puppeteer to get Jackett session cookies, then fetches
- * all configured indexers and adds them to Sonarr and Radarr.
+ * all configured indexers and adds them to Sonarr, Radarr, and Listenarr.
  */
 
 // Load environment variables from .env
@@ -25,6 +25,10 @@ const CONFIG = {
   radarr: {
     url: process.env.RADARR_URL || "http://192.168.31.75:7878",
     apiKey: process.env.RADARR_API_KEY || "",
+  },
+  listenarr: {
+    url: process.env.LISTENARR_URL || "http://192.168.31.75:8988",
+    apiKey: process.env.LISTENARR_API_KEY || "",
   },
   // Set to true to test without actually adding
   dryRun: process.env.DRY_RUN === "true",
@@ -216,13 +220,18 @@ function indexerSupportsCategory(indexer: JackettIndexer, categoryIds: number[])
 }
 
 async function main() {
-  console.log("🎬 Syncing Jackett indexers to Sonarr and Radarr...\n");
+  console.log("🎬 Syncing Jackett indexers to Sonarr, Radarr, and Listenarr...\n");
 
-  // Validate API keys
-  if (!CONFIG.sonarr.apiKey || !CONFIG.radarr.apiKey) {
-    console.error("❌ Missing API keys! Please set them in .env file:");
+  // Validate API keys (at least one service must be configured)
+  const hasSonarr = !!CONFIG.sonarr.apiKey;
+  const hasRadarr = !!CONFIG.radarr.apiKey;
+  const hasListenarr = !!CONFIG.listenarr.apiKey;
+
+  if (!hasSonarr && !hasRadarr && !hasListenarr) {
+    console.error("❌ Missing API keys! Please set at least one in .env file:");
     console.error("   SONARR_API_KEY=xxx");
     console.error("   RADARR_API_KEY=xxx");
+    console.error("   LISTENARR_API_KEY=xxx");
     process.exit(1);
   }
 
@@ -239,56 +248,82 @@ async function main() {
   }
 
   // Get existing indexers to avoid duplicates
-  const sonarrIndexers = await getExistingIndexers(CONFIG.sonarr);
-  const radarrIndexers = await getExistingIndexers(CONFIG.radarr);
+  const sonarrIndexers = hasSonarr ? await getExistingIndexers(CONFIG.sonarr) : [];
+  const radarrIndexers = hasRadarr ? await getExistingIndexers(CONFIG.radarr) : [];
+  const listenarrIndexers = hasListenarr ? await getExistingIndexers(CONFIG.listenarr) : [];
 
   const sonarrNames = new Set(sonarrIndexers.map((i) => i.name));
   const radarrNames = new Set(radarrIndexers.map((i) => i.name));
+  const listenarrNames = new Set(listenarrIndexers.map((i) => i.name));
 
   // Category IDs
   const tvCategories = [8000, 8010, 8020, 8030]; // TV
   const movieCategories = [2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080]; // Movies
+  const bookCategories = [8000, 8010, 8020, 8030, 8040, 8050]; // Books & Audiobooks
 
   let addedToSonarr = 0;
   let addedToRadarr = 0;
+  let addedToListenarr = 0;
 
   for (const indexer of jackettIndexers) {
     console.log(`\n📦 Processing: ${indexer.name} (${indexer.id})`);
 
     // Sonarr (TV)
-    const sonarrExists = sonarrNames.has(indexer.name);
-    if (sonarrExists) {
-      console.log(`  ⏭️  Already in Sonarr, skipping...`);
-    } else if (!indexerSupportsCategory(indexer, tvCategories)) {
-      console.log(`  ⏭️  Doesn't support TV categories, skipping Sonarr...`);
-    } else {
-      const added = await addIndexer(
-        { ...CONFIG.sonarr, name: "Sonarr" },
-        indexer,
-        tvCategories
-      );
-      if (added) addedToSonarr++;
+    if (hasSonarr) {
+      const sonarrExists = sonarrNames.has(indexer.name);
+      if (sonarrExists) {
+        console.log(`  ⏭️  Already in Sonarr, skipping...`);
+      } else if (!indexerSupportsCategory(indexer, tvCategories)) {
+        console.log(`  ⏭️  Doesn't support TV categories, skipping Sonarr...`);
+      } else {
+        const added = await addIndexer(
+          { ...CONFIG.sonarr, name: "Sonarr" },
+          indexer,
+          tvCategories
+        );
+        if (added) addedToSonarr++;
+      }
     }
 
     // Radarr (Movies)
-    const radarrExists = radarrNames.has(indexer.name);
-    if (radarrExists) {
-      console.log(`  ⏭️  Already in Radarr, skipping...`);
-    } else if (!indexerSupportsCategory(indexer, movieCategories)) {
-      console.log(`  ⏭️  Doesn't support Movie categories, skipping Radarr...`);
-    } else {
-      const added = await addIndexer(
-        { ...CONFIG.radarr, name: "Radarr" },
-        indexer,
-        movieCategories
-      );
-      if (added) addedToRadarr++;
+    if (hasRadarr) {
+      const radarrExists = radarrNames.has(indexer.name);
+      if (radarrExists) {
+        console.log(`  ⏭️  Already in Radarr, skipping...`);
+      } else if (!indexerSupportsCategory(indexer, movieCategories)) {
+        console.log(`  ⏭️  Doesn't support Movie categories, skipping Radarr...`);
+      } else {
+        const added = await addIndexer(
+          { ...CONFIG.radarr, name: "Radarr" },
+          indexer,
+          movieCategories
+        );
+        if (added) addedToRadarr++;
+      }
+    }
+
+    // Listenarr (Audiobooks)
+    if (hasListenarr) {
+      const listenarrExists = listenarrNames.has(indexer.name);
+      if (listenarrExists) {
+        console.log(`  ⏭️  Already in Listenarr, skipping...`);
+      } else if (!indexerSupportsCategory(indexer, bookCategories)) {
+        console.log(`  ⏭️  Doesn't support Book categories, skipping Listenarr...`);
+      } else {
+        const added = await addIndexer(
+          { ...CONFIG.listenarr, name: "Listenarr" },
+          indexer,
+          bookCategories
+        );
+        if (added) addedToListenarr++;
+      }
     }
   }
 
   console.log(`\n✨ Done!`);
-  console.log(`   Sonarr: ${addedToSonarr} new indexers added`);
-  console.log(`   Radarr: ${addedToRadarr} new indexers added`);
+  if (hasSonarr) console.log(`   Sonarr: ${addedToSonarr} new indexers added`);
+  if (hasRadarr) console.log(`   Radarr: ${addedToRadarr} new indexers added`);
+  if (hasListenarr) console.log(`   Listenarr: ${addedToListenarr} new indexers added`);
 }
 
 main().catch((error) => {
