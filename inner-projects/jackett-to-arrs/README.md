@@ -151,6 +151,22 @@ The script includes filters to skip certain indexer types. Modify `getJackettInd
    Listenarr: 4 new indexers added
 ```
 
+## Export Indexers to TSV
+
+You can export all Jackett indexers to a TSV file for manual import:
+
+```bash
+cd inner-projects/jackett-to-arrs
+bun run export-indexers
+```
+
+This generates `indexers.tsv` with columns:
+- **Name** - Indexer name
+- **Torznab Feed URL** - Full Torznab URL for the indexer
+- **API Key** - Jackett API key
+
+Use this to manually import indexers into applications that don't have API support.
+
 ## Tips
 
 - Run the script anytime you add new indexers in Jackett

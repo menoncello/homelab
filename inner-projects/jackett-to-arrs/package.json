@@ -1,10 +1,11 @@
 {
   "name": "jackett-to-arrs",
   "version": "1.0.0",
-  "description": "Add Jackett indexers to Sonarr and Radarr",
+  "description": "Add Jackett indexers to Sonarr, Radarr, and Listenarr",
   "type": "module",
   "scripts": {
-    "add-indexers": "bun add-indexers.ts"
+    "add-indexers": "bun add-indexers.ts",
+    "export-indexers": "bun export-indexers.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
