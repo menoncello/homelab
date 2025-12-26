@@ -12,7 +12,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.storage == true
+          - node.hostname == pop-os
       resources:
         limits:
           memory: 8G
@@ -26,7 +26,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - N8N_PATH=/
-      - WEBHOOK_URL=http://192.168.31.208:5678/
+      - WEBHOOK_URL=http://192.168.31.237:5678/
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgresql
       - DB_POSTGRESDB_PORT=5432
@@ -77,4 +77,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /srv/docker/n8n
+      device: /data/docker/n8n
