@@ -1,12 +1,11 @@
 # Chatterbox Audiobook Generator - Python Dependencies
 # Based on: https://github.com/psdwizzard/chatterbox-Audiobook
+# NOTE: Chatterbox is installed via git in Dockerfile
+# NOTE: PyTorch is included in base image
 
-# Core TTS
-chatterbox>=0.1.0
+# Core ML dependencies
 transformers>=4.40.0
 accelerate>=0.20.0
-torch>=2.1.0
-torchaudio>=2.1.0
 
 # Audio processing
 librosa>=0.10.0
