@@ -2,7 +2,7 @@
 # State-of-the-art TTS for audiobook creation with Gradio UI
 # Based on: https://github.com/psdwizzard/chatterbox-Audiobook
 
-FROM nvcr.io/nvidia/pytorch:24.03-py3-runtime
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -28,8 +28,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install Python dependencies
+# PyTorch already included in base image
 RUN pip install --upgrade pip && \
-    pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121 && \
     pip install -r requirements.txt
 
 # Install Chatterbox TTS
