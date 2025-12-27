@@ -129,25 +129,22 @@ Place custom voice samples in:
 
 ## Build Details
 
-### Dockerfile
+### Docker Image
 
-The image is built locally from `Dockerfile` using:
-- **Base:** `nvcr.io/nvidia/pytorch:24.03-py3-runtime`
-- **Python:** 3.x with PyTorch CUDA support
-- **UI:** Gradio 4.0+
-- **Model:** Chatterbox Multilingual from GitHub
+Uses **bhimrazy/chatterbox-tts** from Docker Hub:
+- Wraps Chatterbox TTS in a scalable API using LitServe
+- Supports zero-shot voice cloning and emotion control
+- MIT-licensed and production-ready
 
-To rebuild the image:
+The image is pulled automatically from Docker Hub during deployment:
 ```bash
-cd stacks/chatterbox-stack
-docker build -t chatterbox-audiobook:local .
 docker stack deploy -c docker-compose.yml chatterbox-stack
 ```
 
 ## Resources
 
 ### Project Links
-- **Original Project:** [psdwizzard/chatterbox-Audiobook](https://github.com/psdwizzard/chatterbox-Audiobook)
+- **Docker Image:** [bhimrazy/chatterbox-tts](https://hub.docker.com/r/bhimrazy/chatterbox-tts)
 - **Chatterbox Core:** [resemble-ai/chatterbox](https://github.com/resemble-ai/chatterbox)
 - **Documentation:** [chatterboxtts.com/docs](https://chatterboxtts.com/docs)
 
@@ -206,15 +203,14 @@ curl http://localhost:7860/
 
 ## Maintenance
 
-### Rebuild Image
+### Update Service
 
 ```bash
-cd stacks/chatterbox-stack
-
-# Rebuild with latest dependencies
-docker build --no-cache -t chatterbox-audiobook:local .
+# Pull latest image
+docker pull bhimrazy/chatterbox-tts:latest
 
 # Redeploy
+cd stacks/chatterbox-stack
 docker stack deploy -c docker-compose.yml chatterbox-stack
 ```
 
@@ -234,18 +230,11 @@ tar czf chatterbox-voices-backup-$(date +%Y%m%d).tar.gz \
   /data/docker/chatterbox/voices/
 ```
 
-### Update Dependencies
-
-Edit `requirements.txt` and rebuild:
-```bash
-docker build --no-cache -t chatterbox-audiobook:local .
-```
-
 ---
 
 **Stack:** `chatterbox-stack`
 **Service:** `chatterbox-audiobook`
-**Image:** `chatterbox-audiobook:local` (built from Dockerfile)
+**Image:** `bhimrazy/chatterbox-tts:latest` (Docker Hub)
 **Placement:** `node.labels.gpu == true` (pop-os)
 **Network:** `homelab-net`
-**Port:** 7861 (published) / 7860 (container)
+**Port:** 7861 (published) / 8000 (container - LitServe API)
