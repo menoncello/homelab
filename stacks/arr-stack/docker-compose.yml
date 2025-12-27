@@ -95,6 +95,7 @@ services:
     volumes:
       - transmission-config:/config
       - /media/incomplete:/downloads
+      - /media/audiobooks:/audiobooks
       - transmission-watch:/watch
     networks:
       - homelab-net

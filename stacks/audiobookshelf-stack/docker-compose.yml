@@ -31,10 +31,10 @@ services:
     environment:
       - TZ=America/Sao_Paulo
     volumes:
-      - audiobookshelf-config:/config
-      - audiobookshelf-metadata:/metadata
-      - audiobookshelf-audiobooks:/audiobooks
-      - audiobookshelf-podcasts:/podcasts
+      - /data/docker/audiobookshelf/config:/config
+      - /data/docker/audiobookshelf/metadata:/metadata
+      - /media/audiobooks:/audiobooks
+      - /media/podcasts:/podcasts
     networks:
       - homelab-net
     ports:
@@ -42,43 +42,8 @@ services:
         published: 8080
         protocol: tcp
         mode: host
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 networks:
   homelab-net:
     external: true
     name: homelab-net
-
-volumes:
-  audiobookshelf-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/audiobookshelf/config
-
-  audiobookshelf-metadata:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/audiobookshelf/metadata
-
-  audiobookshelf-audiobooks:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/audiobooks
-
-  audiobookshelf-podcasts:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/podcasts

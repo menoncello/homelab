@@ -1,0 +1,49 @@
+# AudioBookRequest Stack
+# Audiobook request management/wishlist for Audiobookshelf
+# Deploy with: docker stack deploy -c stacks/audiobookrequest-stack/docker-compose.yml audiobookrequest
+#
+# Features:
+# - Overseer/Jellyseerr-like interface for audiobooks
+# - Audible API integration for searching
+# - Prowlarr integration for auto-downloading
+# - User management with 3 groups (untrusted, trusted, admin)
+# - SQLite and Postgres support
+# - Mobile-friendly UI
+
+version: '3.8'
+
+services:
+  audiobookrequest:
+    image: markbeep/audiobookrequest:latest
+    hostname: audiobookrequest
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == pop-os
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: any
+    environment:
+      - TZ=America/Sao_Paulo
+      - ABR_APP__PORT=8000
+      - ABR_APP__DEFAULT_REGION=br
+      - ABR_APP__CONFIG_DIR=/config
+    volumes:
+      - /data/docker/audiobookrequest:/config
+    networks:
+      - homelab-net
+    ports:
+      - target: 8000
+        published: 8000
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net

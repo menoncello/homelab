@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-Docker Swarm-based homelab running on 2 Ubuntu 25.04 servers (Helios + Xeon01) with 2.5Gbps networking and GPU acceleration. Focused on media streaming, content automation, and self-hosted services.
+Docker Swarm-based homelab running on 2 servers (pop-os + Xeon01) with 2.5Gbps networking and GPU acceleration. Focused on media streaming, content automation, and self-hosted services.
 
 **Architecture:**
-- **Helios (Manager):** i7/64GB/RTX 3070ti - GPU services + media transcoding
+- **pop-os (Manager):** i7/64GB/RTX 3070ti - GPU services + media transcoding
 - **Xeon01 (Worker):** Xeon/96GB - Databases + storage-intensive services
 
 **Key Technologies:**
@@ -80,7 +80,7 @@ docker service inspect infrastructure_network-setup
 
 **Node labels (applied via setup-nodes.sh):**
 ```yaml
-# Helios labels
+# pop-os labels
 - node.labels.gpu == true      # GPU-accelerated services
 - node.labels.arr == true      # Media download automation
 - node.labels.proxy == true    # Reverse proxy
@@ -182,8 +182,8 @@ volumes:
 ```
 
 **Host paths:**
-- **Helios /data:** `/data/docker/` - Container configs
-- **Helios /media:** `/media/` - Media libraries
+- **pop-os /data:** `/data/docker/` - Container configs
+- **pop-os /media:** `/media/` - Media libraries
 - **Xeon01 /srv:** `/srv/docker/` - Container configs
 - **Xeon01 /home:** `/home/docker-data/` - Database and user data
 
@@ -279,8 +279,8 @@ TZ=America/Sao_Paulo
 ### Initial Setup
 
 ```bash
-# 1. Setup GPU runtime (Helios only)
-ssh eduardo@192.168.31.237
+# 1. Setup GPU runtime (pop-os only)
+ssh eduardo@192.168.31.75
 ./scripts/setup-gpu.sh
 
 # 2. Create volume structure (both servers)
@@ -327,7 +327,7 @@ docker service update \
 ### Network Security
 
 **Docker API:**
-- Exposed only on internal network (Helios:2375)
+- Exposed only on internal network (pop-os:2375)
 - Never expose Docker API to internet
 - Consider TLS for production
 
@@ -662,18 +662,18 @@ docker volume inspect <volume>
 ### Access URLs
 
 After deployment:
-- **Nginx Proxy Manager:** http://192.168.31.237:81
+- **Nginx Proxy Manager:** http://192.168.31.75:81
+- **Audiobookshelf:** http://192.168.31.75:8080
 - **Jellyfin:** http://jellyfin.homelab.local (after proxy config)
 - **Sonarr:** http://sonarr.homelab.local
 - **Radarr:** http://radarr.homelab.local
 - **Nextcloud:** http://nextcloud.homelab.local
-- **Audiobookshelf:** http://audiobooks.homelab.local
 
 ### Server Access
 
 ```bash
-# Helios (Manager)
-ssh eduardo@192.168.31.237
+# pop-os (Manager)
+ssh eduardo@192.168.31.75
 docker context use homelab
 
 # Xeon01 (Worker)
@@ -723,6 +723,6 @@ ssh eduardo@192.168.31.208
 
 ---
 
-**Last Updated:** 2025-12-22
+**Last Updated:** 2025-12-26
 **Maintained by:** @eduardo
 **Questions?** Check docs/plans/ or review implementation guide

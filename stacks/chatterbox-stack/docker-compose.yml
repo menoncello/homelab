@@ -1,0 +1,76 @@
+# Chatterbox Audiobook Generator Stack
+# State-of-the-art open-source multilingual TTS for audiobook generation
+# Based on: https://github.com/psdwizzard/chatterbox-Audiobook
+# Features: 23 languages, voice cloning, professional volume normalization
+
+version: '3.8'
+
+services:
+  chatterbox-audiobook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chatterbox-audiobook:local
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        limits:
+          memory: 16G
+        reservations:
+          memory: 8G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.chatterbox-audiobook.rule=Host(`chatterbox.homelab.local`)"
+        - "traefik.http.routers.chatterbox-audiobook.entrypoints=web"
+        - "traefik.http.services.chatterbox-audiobook.loadbalancer.server.port=7860"
+    environment:
+      - TZ=America/Sao_Paulo
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
+      - GRADIO_SERVER_NAME=0.0.0.0
+    volumes:
+      # HuggingFace cache for models
+      - chatterbox-huggingface:/root/.cache/huggingface
+      # Voice profiles for cloning
+      - chatterbox-voices:/app/voices
+      # Output directory for generated audiobooks
+      - /media/audiobooks:/app/output:rw
+    networks:
+      - homelab-net
+    ports:
+      - target: 7860
+        published: 7860
+        protocol: tcp
+        mode: host
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+networks:
+  homelab-net:
+    external: true
+
+volumes:
+  chatterbox-huggingface:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/chatterbox/huggingface
+
+  chatterbox-voices:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/chatterbox/voices

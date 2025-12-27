@@ -30,9 +30,9 @@ services:
       - LISTENARR_PUBLIC_URL=http://listenarr.homelab.local
       - TZ=America/Sao_Paulo
     volumes:
-      - listenarr-config:/app/config
-      - listenarr-downloads:/downloads
-      - listenarr-audiobooks:/audiobooks
+      - /data/docker/listenarr:/app/config
+      - /media/downloads:/downloads
+      - /media/audiobooks:/audiobooks
     networks:
       - homelab-net
     ports:
@@ -40,36 +40,8 @@ services:
         published: 8988
         protocol: tcp
         mode: host
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 networks:
   homelab-net:
     external: true
     name: homelab-net
-
-volumes:
-  listenarr-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/listenarr
-
-  listenarr-downloads:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/downloads
-
-  listenarr-audiobooks:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/audiobooks

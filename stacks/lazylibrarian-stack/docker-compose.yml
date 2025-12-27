@@ -1,0 +1,51 @@
+# LazyLibrarian Stack
+# Author follow and ebook/audiobook automation
+# Deploy with: docker stack deploy -c stacks/lazylibrarian-stack/docker-compose.yml lazylibrarian
+#
+# Features:
+# - Follow authors and auto-grab new releases
+# - Goodreads, LibraryThing, GoogleBooks integration
+# - Ebook and audiobook metadata management
+# - Magazine support
+# - Calibre integration (via docker-mods)
+# - ffmpeg for audiobook conversion
+
+version: '3.8'
+
+services:
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    hostname: lazylibrarian
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == pop-os
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: any
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - DOCKER_MODS=linuxserver/mods:lazylibrarian-ffmpeg
+    volumes:
+      - /data/docker/lazylibrarian:/config
+      - /media/incomplete:/downloads
+      - /media/audiobooks:/books
+    networks:
+      - homelab-net
+    ports:
+      - target: 5299
+        published: 5299
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net

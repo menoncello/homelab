@@ -1,0 +1,821 @@
+{
+  "name": "default",
+  "config": [
+    {
+      "name": "pageTitle",
+      "value": "Homelab Dashboard"
+    },
+    {
+      "name": "metaTitle",
+      "value": "My Homelab"
+    },
+    {
+      "name": "logoImageUrl",
+      "value": ""
+    },
+    {
+      "name": "faviconImageUrl",
+      "value": ""
+    },
+    {
+      "name": "backgroundImageUrl",
+      "value": ""
+    },
+    {
+      "name": "backgroundImageAttachment",
+      "value": "fixed"
+    },
+    {
+      "name": "backgroundImageSize",
+      "value": "cover"
+    },
+    {
+      "name": "primaryColor",
+      "value": "#3b82f6"
+    },
+    {
+      "name": "secondaryColor",
+      "value": "#8b5cf6"
+    },
+    {
+      "name": "opacity",
+      "value": "100"
+    },
+    {
+      "name": "customCss",
+      "value": ""
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Media",
+      "position": 1,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "2",
+      "name": "Automation",
+      "position": 2,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "3",
+      "name": "Requests",
+      "position": 3,
+      "color": "#ec4899"
+    },
+    {
+      "id": "4",
+      "name": "Infrastructure",
+      "position": 4,
+      "color": "#10b981"
+    },
+    {
+      "id": "5",
+      "name": "Downloads",
+      "position": 5,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "6",
+      "name": "Books",
+      "position": 6,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "7",
+      "name": "Tools",
+      "position": 7,
+      "color": "#6366f1"
+    }
+  ],
+  "apps": [
+    {
+      "id": "1",
+      "name": "Jellyfin",
+      "url": "http://192.168.31.75:8096",
+      "icon": "/icons/jellyfin.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "1",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "2",
+      "name": "Audiobookshelf",
+      "url": "http://192.168.31.75:8080",
+      "icon": "/icons/audiobookshelf.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "1",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "3",
+      "name": "Kavita",
+      "url": "http://192.168.31.75:5000",
+      "icon": "/icons/kavita.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "6",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "4",
+      "name": "Sonarr",
+      "url": "http://192.168.31.75:8989",
+      "icon": "/icons/sonarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "sonarr",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://sonarr:8989"
+          }
+        ]
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "5",
+      "name": "Radarr",
+      "url": "http://192.168.31.75:7878",
+      "icon": "/icons/radarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "radarr",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://radarr:7878"
+          }
+        ]
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "6",
+      "name": "Lidarr",
+      "url": "http://192.168.31.75:8686",
+      "icon": "/icons/lidarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "lidarr",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://lidarr:8686"
+          }
+        ]
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "7",
+      "name": "Bazarr",
+      "url": "http://192.168.31.75:6767",
+      "icon": "/icons/bazarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 3,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "8",
+      "name": "Prowlarr",
+      "url": "http://192.168.31.75:9696",
+      "icon": "/icons/prowlarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 4,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "9",
+      "name": "Jackett",
+      "url": "http://192.168.31.75:9117",
+      "icon": "/icons/jackett.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "2",
+      "position": {
+        "x": 5,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "10",
+      "name": "Listenarr",
+      "url": "http://192.168.31.75:8988",
+      "icon": "/icons/listenarr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "6",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "11",
+      "name": "LazyLibrarian",
+      "url": "http://192.168.31.75:5299",
+      "icon": "/icons/lazylibrarian.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "6",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "12",
+      "name": "Jellyseerr",
+      "url": "http://192.168.31.75:5055",
+      "icon": "/icons/jellyseerr.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "overseerr",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://jellyseerr:5055"
+          }
+        ]
+      },
+      "categoryId": "3",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "13",
+      "name": "AudioBookRequest",
+      "url": "http://192.168.31.75:8000",
+      "icon": "/icons/audiobooks.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "3",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "14",
+      "name": "qBittorrent",
+      "url": "http://192.168.31.75:9091",
+      "icon": "/icons/qbittorrent.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "qbittorrent",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://transmission:9091"
+          }
+        ]
+      },
+      "categoryId": "5",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "15",
+      "name": "Nginx Proxy Manager",
+      "url": "http://192.168.31.75:81",
+      "icon": "/icons/nginx.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "4",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "16",
+      "name": "Pi-hole",
+      "url": "http://192.168.31.75:8053",
+      "icon": "/icons/pihole.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": "pihole",
+        "properties": [
+          {
+            "field": "apiKey",
+            "value": ""
+          },
+          {
+            "field": "url",
+            "value": "http://pihole.admin"
+          }
+        ]
+      },
+      "categoryId": "4",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "17",
+      "name": "n8n",
+      "url": "http://192.168.31.75:5678",
+      "icon": "/icons/n8n.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "7",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "18",
+      "name": "ebook2audiobook",
+      "url": "http://192.168.31.75:7860",
+      "icon": "/icons/book.png",
+      "appearance": {
+        "iconSize": "medium",
+        "position": "default",
+        "statusType": "dot",
+        "isNameVisible": true
+      },
+      "network": {
+        "enabledStatusChecker": true,
+        "statusCodes": ["200", "301", "302", "307", "308"],
+        "method": "GET"
+      },
+      "behaviour": {
+        "externalUrl": "",
+        "openInNewTab": true
+      },
+      "integration": {
+        "type": null,
+        "properties": []
+      },
+      "categoryId": "7",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    }
+  ],
+  "widgets": [
+    {
+      "id": "1",
+      "type": "date",
+      "properties": {
+        "title": "Data e Hora",
+        "use24HourFormat": true,
+        "timeZone": "America/Sao_Paulo"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    },
+    {
+      "id": "2",
+      "type": "system",
+      "properties": {
+        "title": "Sistema",
+        "cpu": {
+          "enabled": true
+        },
+        "memory": {
+          "enabled": true
+        },
+        "disk": {
+          "enabled": true
+        }
+      },
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "shape": {
+        "w": 1,
+        "h": 1
+      }
+    }
+  ],
+  "gridPresets": [
+    {
+      "name": "small",
+      "width": 640,
+      "columns": 2
+    },
+    {
+      "name": "medium",
+      "width": 1024,
+      "columns": 4
+    },
+    {
+      "name": "large",
+      "width": 1440,
+      "columns": 6
+    }
+  ]
+}
