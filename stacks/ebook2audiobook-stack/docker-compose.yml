@@ -17,10 +17,10 @@ services:
           memory: 8G
         reservations:
           memory: 4G
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+          generic_resources:
+            - discrete_resource_spec:
+                kind: 'nvidia.com/gpu'
+                value: 1
       restart_policy:
         condition: on-failure
         delay: 5s
