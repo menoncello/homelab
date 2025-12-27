@@ -18,11 +18,12 @@ if [ "$HOSTNAME" = "helios" ]; then
 
     # Helios: /data/docker for configs
     echo "Creating /data/docker directories..."
-    mkdir -p /data/docker/{jellyfin,sonarr,radarr,transmission,nginx-proxy}
+    mkdir -p /data/docker/{jellyfin,sonarr,radarr,transmission,nginx-proxy,ebook2audiobook}
+    mkdir -p /data/docker/ebook2audiobook/{config,models,output}
 
     # Helios: /media for media libraries
     echo "Creating /media directories..."
-    mkdir -p /media/{movies,series,anime,incomplete,incoming}
+    mkdir -p /media/{movies,series,anime,incomplete,incoming,ebooks}
 
     echo "Setting permissions..."
     chown -R 1000:1000 /data/docker/
