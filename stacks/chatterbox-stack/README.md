@@ -75,7 +75,7 @@ docker service ps chatterbox-stack_chatterbox-audiobook
 docker service logs -f chatterbox-stack_chatterbox-audiobook
 
 # Test Web UI
-curl http://192.168.31.75:7860/
+curl http://192.168.31.75:7861/
 
 # Test via Traefik (after proxy config)
 curl http://chatterbox.homelab.local
@@ -86,7 +86,7 @@ curl http://chatterbox.homelab.local
 ### Web UI
 
 Access the Gradio web interface at:
-- **Internal:** http://192.168.31.75:7860
+- **Internal:** http://192.168.31.75:7861
 - **Via Traefik:** http://chatterbox.homelab.local (after proxy configuration)
 
 #### Features:
@@ -248,4 +248,4 @@ docker build --no-cache -t chatterbox-audiobook:local .
 **Image:** `chatterbox-audiobook:local` (built from Dockerfile)
 **Placement:** `node.labels.gpu == true` (pop-os)
 **Network:** `homelab-net`
-**Port:** 7860 (Gradio Web UI)
+**Port:** 7861 (published) / 7860 (container)

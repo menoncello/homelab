@@ -29,7 +29,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.chatterbox-audiobook.rule=Host(`chatterbox.homelab.local`)"
         - "traefik.http.routers.chatterbox-audiobook.entrypoints=web"
-        - "traefik.http.services.chatterbox-audiobook.loadbalancer.server.port=7860"
+        - "traefik.http.services.chatterbox-audiobook.loadbalancer.server.port=7861"
     environment:
       - TZ=America/Sao_Paulo
       - NVIDIA_VISIBLE_DEVICES=all
@@ -46,7 +46,7 @@ services:
       - homelab-net
     ports:
       - target: 7860
-        published: 7860
+        published: 7861
         protocol: tcp
         mode: host
     healthcheck:
