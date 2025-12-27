@@ -41,6 +41,11 @@ services:
       - /media/ebooks:/app/ebooks:ro
     networks:
       - homelab-net
+    ports:
+      - target: 7860
+        published: 7860
+        protocol: tcp
+        mode: host
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7860/"]
       interval: 30s
