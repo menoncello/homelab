@@ -1,12 +1,12 @@
-# Chatterbox TTS API Stack
-# FastAPI-powered OpenAI-compatible TTS API with voice cloning
-# Based on: https://github.com/travisvn/chatterbox-tts-api
+# Chatterbox TTS Server Stack
+# FastAPI-powered TTS with Web UI, voice cloning, audiobook support
+# Based on: https://github.com/devnen/Chatterbox-TTS-Server
 
 version: '3.8'
 
 services:
-  chatterbox-api:
-    image: travisvn/chatterbox-tts-api:latest
+  chatterbox-server:
+    image: devnen/chatterbox-tts-server:latest
     deploy:
       replicas: 1
       placement:
@@ -25,46 +25,52 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.chatterbox.rule=Host(`chatterbox.homelab.local`)"
         - "traefik.http.routers.chatterbox.entrypoints=web"
-        - "traefik.http.services.chatterbox.loadbalancer.server.port=4123"
+        - "traefik.http.services.chatterbox.loadbalancer.server.port=8004"
     environment:
       - TZ=America/Sao_Paulo
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
-      - PORT=4123
-      - USE_MULTILINGUAL_MODEL=true
-      - DEVICE=cuda
     volumes:
       # HuggingFace cache for models
-      - chatterbox-models:/cache
-      # Voice library for cloned voices
+      - chatterbox-hf-cache:/app/hf_cache
+      # Configuration
+      - chatterbox-config:/app/config.yaml
+      # Predefined voices
       - chatterbox-voices:/app/voices
-      # Output directory for generated audio
-      - /media/audiobooks:/app/output:rw
+      # Reference audio for cloning
+      - chatterbox-reference:/app/reference_audio
+      # Output directory
+      - /media/audiobooks:/app/outputs
+      # Logs
+      - chatterbox-logs:/app/logs
     networks:
       - homelab-net
     ports:
-      - target: 4123
-        published: 4123
+      - target: 8004
+        published: 8004
         protocol: tcp
         mode: host
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4123/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8004/api/ui/initial-data"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 120s
 
 networks:
   homelab-net:
     external: true
 
 volumes:
-  chatterbox-models:
+  chatterbox-hf-cache:
+    driver: local
+
+  chatterbox-config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /data/docker/chatterbox/models
+      device: /data/docker/chatterbox/config.yaml
 
   chatterbox-voices:
     driver: local
@@ -72,3 +78,17 @@ volumes:
       type: none
       o: bind
       device: /data/docker/chatterbox/voices
+
+  chatterbox-reference:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/chatterbox/reference_audio
+
+  chatterbox-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/chatterbox/logs

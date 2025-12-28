@@ -1,10 +1,10 @@
-# Chatterbox TTS API Stack
+# Chatterbox TTS Server Stack
 
 ## Overview
 
-**Chatterbox TTS API** - FastAPI-powered OpenAI-compatible TTS API with voice cloning and multilingual support.
+**Chatterbox TTS Server** - FastAPI-powered TTS with Web UI, voice cloning, and audiobook support.
 
-Based on [travisvn/chatterbox-tts-api](https://github.com/travisvn/chatterbox-tts-api).
+Based on [devnen/Chatterbox-TTS-Server](https://github.com/devnen/Chatterbox-TTS-Server).
 
 ### Key Features
 
@@ -12,6 +12,8 @@ Based on [travisvn/chatterbox-tts-api](https://github.com/travisvn/chatterbox-tt
 - **22 languages** supported with language-aware voice cloning
 - **GPU-accelerated** inference using NVIDIA CUDA
 - **Voice cloning** with 10-30 seconds of audio
+- **Web UI** for interactive TTS generation at `/`
+- **Audiobook support** with chapter/segment processing
 - **FastAPI Performance** - High-performance async API
 - **Interactive docs** at `/docs`
 
@@ -44,19 +46,23 @@ nvidia-smi
 docker network ls | grep homelab-net
 ```
 
+### Create Required Directories
+
+```bash
+# Create config and data directories on pop-os
+sudo mkdir -p /data/docker/chatterbox/{config.yaml,voices,reference_audio,logs}
+sudo chown -R 1000:1000 /data/docker/chatterbox/
+
+# Create output directory for audiobooks
+sudo mkdir -p /media/audiobooks
+sudo chown -R 1000:1000 /media/audiobooks/
+```
+
 ### Deploy Stack
 
 ```bash
 # From stack directory
 cd stacks/chatterbox-stack
-
-# Create volume directories
-sudo mkdir -p /data/docker/chatterbox/{models,voices}
-sudo chown -R 1000:1000 /data/docker/chatterbox/
-
-# Create output directory
-sudo mkdir -p /media/audiobooks
-sudo chown -R 1000:1000 /media/audiobooks/
 
 # Deploy stack
 docker stack deploy -c docker-compose.yml chatterbox-stack
@@ -66,27 +72,33 @@ docker stack deploy -c docker-compose.yml chatterbox-stack
 
 ```bash
 # Check service status
-docker service ps chatterbox-stack_chatterbox-api
+docker service ps chatterbox-stack_chatterbox-server
 
 # View logs
-docker service logs -f chatterbox-stack_chatterbox-api
+docker service logs -f chatterbox-stack_chatterbox-server
 
 # Test health endpoint
-curl http://192.168.31.75:4123/health
+curl http://192.168.31.75:8004/api/ui/initial-data
 
 # Test via Traefik (after proxy config)
-curl http://chatterbox.homelab.local/health
+curl http://chatterbox.homelab.local/api/ui/initial-data
 ```
 
 ## Usage
 
+### Web UI
+
+Access the web interface at:
+- **Direct:** http://192.168.31.75:8004
+- **Via Traefik:** http://chatterbox.homelab.local
+
 ### API Endpoints
 
-**Base URL:** http://192.168.31.75:4123
+**Base URL:** http://192.168.31.75:8004
 
 #### Basic Text-to-Speech
 ```bash
-curl -X POST http://192.168.31.75:4123/v1/audio/speech \
+curl -X POST http://192.168.31.75:8004/v1/audio/speech \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello world!"}' \
   --output speech.wav
@@ -94,7 +106,7 @@ curl -X POST http://192.168.31.75:4123/v1/audio/speech \
 
 #### Voice Cloning
 ```bash
-curl -X POST http://192.168.31.75:4123/v1/audio/speech/upload \
+curl -X POST http://192.168.31.75:8004/v1/audio/speech/upload \
   -F "input=Hello with my voice!" \
   -F "voice_file=@my_voice.mp3" \
   --output custom_voice.wav
@@ -103,16 +115,16 @@ curl -X POST http://192.168.31.75:4123/v1/audio/speech/upload \
 #### Voice Library Management
 ```bash
 # Upload voice to library
-curl -X POST http://192.168.31.75:4123/voices \
+curl -X POST http://192.168.31.75:8004/voices \
   -F "voice_file=@my_voice.wav" \
   -F "voice_name=my-custom-voice" \
   -F "language=en"
 
 # List voices
-curl http://192.168.31.75:4123/voices
+curl http://192.168.31.75:8004/voices
 
 # Use voice by name
-curl -X POST http://192.168.31.75:4123/v1/audio/speech \
+curl -X POST http://192.168.31.75:8004/v1/audio/speech \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello!", "voice": "my-custom-voice"}' \
   --output output.wav
@@ -121,8 +133,8 @@ curl -X POST http://192.168.31.75:4123/v1/audio/speech \
 ### Interactive Documentation
 
 Access the interactive API documentation:
-- **Swagger UI:** http://192.168.31.75:4123/docs
-- **ReDoc:** http://192.168.31.75:4123/redoc
+- **Swagger UI:** http://192.168.31.75:8004/docs
+- **ReDoc:** http://192.168.31.75:8004/redoc
 - **Via Traefik:** http://chatterbox.homelab.local/docs
 
 ## Configuration
@@ -131,32 +143,32 @@ Access the interactive API documentation:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `4123` | API server port |
-| `USE_MULTILINGUAL_MODEL` | `true` | Enable 22-language support |
-| `DEVICE` | `auto` | Device (auto/cuda/mps/cpu) |
-| `EXAGGERATION` | `0.5` | Emotion intensity (0.25-2.0) |
-| `TEMPERATURE` | `0.8` | Sampling randomness (0.05-5.0) |
-| `CFG_WEIGHT` | `0.5` | Pace control (0.0-1.0) |
+| `TZ` | `America/Sao_Paulo` | Timezone |
+| `NVIDIA_VISIBLE_DEVICES` | `all` | GPU visibility |
+| `NVIDIA_DRIVER_CAPABILITIES` | `compute,video,utility,graphics` | GPU driver features |
 
 ### Volume Paths
 
 | Volume | Host Path | Purpose |
 |--------|-----------|---------|
-| `chatterbox-models` | `/data/docker/chatterbox/models` | HuggingFace model cache |
+| `chatterbox-hf-cache` | (Docker volume) | HuggingFace model cache |
+| `chatterbox-config` | `/data/docker/chatterbox/config.yaml` | Configuration file |
 | `chatterbox-voices` | `/data/docker/chatterbox/voices` | Voice library |
-| `/app/output` | `/media/audiobooks` | Generated audio files |
+| `chatterbox-reference` | `/data/docker/chatterbox/reference_audio` | Reference audio for cloning |
+| `/app/outputs` | `/media/audiobooks` | Generated audio files |
+| `chatterbox-logs` | `/data/docker/chatterbox/logs` | Application logs |
 
 ## Resources
 
 ### Project Links
-- **GitHub:** [travisvn/chatterbox-tts-api](https://github.com/travisvn/chatterbox-tts-api)
-- **Documentation:** [chatterboxtts.com/docs](https://chatterboxtts.com/docs)
-- **Docker Hub:** [travisvn/chatterbox-tts-api](https://hub.docker.com/r/travisvn/chatterbox-tts-api)
+- **GitHub:** [devnen/Chatterbox-TTS-Server](https://github.com/devnen/Chatterbox-TTS-Server)
+- **Documentation:** [Chatterbox-TTS-Server README](https://github.com/devnen/Chatterbox-TTS-Server#readme)
+- **Docker Hub:** [devnen/chatterbox-tts-server](https://hub.docker.com/r/devnen/chatterbox-tts-server)
 
 ### API Documentation
-- [Complete API Reference](https://chatterboxtts.com/docs#api-endpoints)
-- [Voice Library Guide](https://chatterboxtts.com/docs#-voice-library-management)
-- [Multilingual Support](https://chatterboxtts.com/docs#-multilingual-support)
+- [Web UI Demo](http://192.168.31.75:8004)
+- [FastAPI Docs](http://192.168.31.75:8004/docs)
+- [OpenAI API Reference](https://github.com/devnen/Chatterbox-TTS-Server#openai-compatible-api)
 
 ## Troubleshooting
 
@@ -167,17 +179,17 @@ Access the interactive API documentation:
 docker exec $(docker ps -q -f name=chatterbox) nvidia-smi
 
 # Check service logs
-docker service logs chatterbox-stack_chatterbox-api
+docker service logs chatterbox-stack_chatterbox-server
 ```
 
 ### Service Not Starting
 
 ```bash
-# Verify volume permissions
+# Verify volume directories exist
 ls -la /data/docker/chatterbox/
 
 # Check resource constraints
-docker service inspect chatterbox-stack_chatterbox-api | grep -A 10 "Resources"
+docker service inspect chatterbox-stack_chatterbox-server | grep -A 10 "Resources"
 ```
 
 ### Poor Performance
@@ -187,7 +199,7 @@ docker service inspect chatterbox-stack_chatterbox-api | grep -A 10 "Resources"
 nvidia-smi dmon -s u
 
 # Check memory limits
-docker stats chatterbox-stack_chatterbox-api
+docker stats chatterbox-stack_chatterbox-server
 ```
 
 ## Maintenance
@@ -196,7 +208,7 @@ docker stats chatterbox-stack_chatterbox-api
 
 ```bash
 # Pull latest image
-docker pull travisvn/chatterbox-tts-api:latest
+docker pull devnen/chatterbox-tts-server:latest
 
 # Redeploy
 cd stacks/chatterbox-stack
@@ -206,9 +218,9 @@ docker stack deploy -c docker-compose.yml chatterbox-stack
 ### Clean Model Cache
 
 ```bash
-# Remove cached models to free space
-sudo rm -rf /data/docker/chatterbox/models/*
-docker service update --force chatterbox-stack_chatterbox-api
+# Remove cached models to free space (Docker volume)
+docker volume rm chatterbox-stack_chatterbox-hf-cache
+docker service update --force chatterbox-stack_chatterbox-server
 ```
 
 ### Backup Voice Library
@@ -222,8 +234,8 @@ tar czf chatterbox-voices-backup-$(date +%Y%m%d).tar.gz \
 ---
 
 **Stack:** `chatterbox-stack`
-**Service:** `chatterbox-api`
-**Image:** `travisvn/chatterbox-tts-api:latest`
+**Service:** `chatterbox-server`
+**Image:** `devnen/chatterbox-tts-server:latest`
 **Placement:** `node.labels.gpu == true` (pop-os)
 **Network:** `homelab-net`
-**Port:** 4123 (FastAPI)
+**Port:** 8004 (FastAPI + Web UI)
