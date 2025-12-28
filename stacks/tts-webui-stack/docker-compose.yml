@@ -1,0 +1,88 @@
+# TTS WebUI Stack
+# Gradio + React WebUI for Chatterbox TTS and other TTS models
+# Based on: https://github.com/rsxdalv/TTS-WebUI
+
+version: '3.8'
+
+services:
+  tts-webui:
+    image: ghcr.io/rsxdalv/tts-webui:main
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        limits:
+          memory: 16G
+        reservations:
+          memory: 8G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.ttswebui.rule=Host(`ttswebui.homelab.local`)"
+        - "traefik.http.routers.ttswebui.entrypoints=web"
+        - "traefik.http.services.ttswebui.loadbalancer.server.port=7770"
+    environment:
+      - TZ=America/Sao_Paulo
+      - TTS_PORT=7770
+      - UI_PORT=3000
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
+    volumes:
+      # Models cache
+      - tts-webui-models:/app/models
+      # Voice library
+      - tts-webui-voices:/app/voices
+      # Output directory
+      - /media/audiobooks:/app/outputs
+      # Database (optional)
+      - tts-webui-db:/app/db
+    networks:
+      - homelab-net
+    ports:
+      # Gradio UI
+      - target: 7770
+        published: 7770
+        protocol: tcp
+        mode: host
+      # React UI
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7770/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 300s
+
+networks:
+  homelab-net:
+    external: true
+
+volumes:
+  tts-webui-models:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/tts-webui/models
+
+  tts-webui-voices:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/tts-webui/voices
+
+  tts-webui-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/tts-webui/db
