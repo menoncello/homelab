@@ -1,12 +1,12 @@
-# Chatterbox TTS Server Stack
-# FastAPI-powered TTS with Web UI, voice cloning, audiobook support
-# Based on: https://github.com/devnen/Chatterbox-TTS-Server
+# Chatterbox TTS API Stack
+# FastAPI-powered OpenAI-compatible TTS API with voice cloning
+# Based on: https://github.com/travisvn/chatterbox-tts-api
 
 version: '3.8'
 
 services:
-  chatterbox-server:
-    image: devnen/chatterbox-tts-server:latest
+  chatterbox-api:
+    image: travisvn/chatterbox-tts-api:latest
     deploy:
       replicas: 1
       placement:
@@ -25,33 +25,27 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.chatterbox.rule=Host(`chatterbox.homelab.local`)"
         - "traefik.http.routers.chatterbox.entrypoints=web"
-        - "traefik.http.services.chatterbox.loadbalancer.server.port=8004"
+        - "traefik.http.services.chatterbox.loadbalancer.server.port=4123"
     environment:
       - TZ=America/Sao_Paulo
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
     volumes:
-      # HuggingFace cache for models
-      - chatterbox-hf-cache:/app/hf_cache
-      # Configuration
-      - chatterbox-config:/app/config.yaml
-      # Predefined voices
+      # Model cache
+      - chatterbox-models:/root/.cache/huggingface
+      # Voice library
       - chatterbox-voices:/app/voices
-      # Reference audio for cloning
-      - chatterbox-reference:/app/reference_audio
       # Output directory
-      - /media/audiobooks:/app/outputs
-      # Logs
-      - chatterbox-logs:/app/logs
+      - /media/audiobooks:/app/output
     networks:
       - homelab-net
     ports:
-      - target: 8004
-        published: 8004
+      - target: 4123
+        published: 4123
         protocol: tcp
         mode: host
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8004/api/ui/initial-data"]
+      test: ["CMD", "curl", "-f", "http://localhost:4123/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -62,15 +56,12 @@ networks:
     external: true
 
 volumes:
-  chatterbox-hf-cache:
-    driver: local
-
-  chatterbox-config:
+  chatterbox-models:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /data/docker/chatterbox/config.yaml
+      device: /data/docker/chatterbox/models
 
   chatterbox-voices:
     driver: local
@@ -78,17 +69,3 @@ volumes:
       type: none
       o: bind
       device: /data/docker/chatterbox/voices
-
-  chatterbox-reference:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/chatterbox/reference_audio
-
-  chatterbox-logs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/chatterbox/logs
