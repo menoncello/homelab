@@ -1,31 +1,31 @@
-# Chatterbox Audiobook Generator Stack
+# Chatterbox TTS API Stack
 
 ## Overview
 
-**Chatterbox Audiobook Generator** - State-of-the-art open-source multilingual TTS with Gradio Web UI for audiobook creation.
+**Chatterbox TTS API** - FastAPI-powered OpenAI-compatible TTS API with voice cloning and multilingual support.
 
-Based on [psdwizzard/chatterbox-Audiobook](https://github.com/psdwizzard/chatterbox-Audiobook), featuring professional voice cloning and volume normalization.
+Based on [travisvn/chatterbox-tts-api](https://github.com/travisvn/chatterbox-tts-api).
 
 ### Key Features
 
-- **Gradio Web UI** - User-friendly interface for audiobook generation
-- **23 languages** supported with zero-shot voice cloning
+- **OpenAI-Compatible API** - Drop-in replacement for OpenAI's TTS API
+- **22 languages** supported with language-aware voice cloning
 - **GPU-accelerated** inference using NVIDIA CUDA
-- **Voice cloning** with as little as 5 seconds of audio
-- **Professional audio normalization** for broadcast-quality output
-- **MIT licensed** - fully open source
+- **Voice cloning** with 10-30 seconds of audio
+- **FastAPI Performance** - High-performance async API
+- **Interactive docs** at `/docs`
 
 ### Hardware Requirements
 
 | Component | Minimum | Recommended | Homelab |
 |-----------|---------|-------------|----------|
-| GPU VRAM | 6GB | 8-16GB | **8GB (RTX 3070ti)** |
-| RAM | 8GB | 16GB+ | **64GB** |
-| Storage | 50GB | 240GB+ | **NVMe SSD** |
+| GPU VRAM | 4GB | 8GB+ | **8GB (RTX 3070ti)** |
+| RAM | 4GB | 8GB+ | **64GB** |
+| Storage | 10GB | 50GB+ | **NVMe SSD** |
 
 ### Language Support
 
-Chatterbox Multilingual supports 23 languages including:
+22 languages including:
 - English (en), Portuguese (pt), Spanish (es)
 - French (fr), German (de), Italian (it)
 - Japanese (ja), Korean (ko), Chinese (zh)
@@ -40,9 +40,6 @@ Chatterbox Multilingual supports 23 languages including:
 # Verify GPU is available on pop-os
 nvidia-smi
 
-# Verify NVIDIA Container Runtime
-docker info | grep nvidia
-
 # Verify network exists
 docker network ls | grep homelab-net
 ```
@@ -54,14 +51,14 @@ docker network ls | grep homelab-net
 cd stacks/chatterbox-stack
 
 # Create volume directories
-sudo mkdir -p /data/docker/chatterbox/{huggingface,voices}
+sudo mkdir -p /data/docker/chatterbox/{models,voices}
 sudo chown -R 1000:1000 /data/docker/chatterbox/
 
 # Create output directory
 sudo mkdir -p /media/audiobooks
-sudo chown -R 1000:1000 /media/audiobooks
+sudo chown -R 1000:1000 /media/audiobooks/
 
-# Build and deploy stack (builds image from Dockerfile)
+# Deploy stack
 docker stack deploy -c docker-compose.yml chatterbox-stack
 ```
 
@@ -69,43 +66,64 @@ docker stack deploy -c docker-compose.yml chatterbox-stack
 
 ```bash
 # Check service status
-docker service ps chatterbox-stack_chatterbox-audiobook
+docker service ps chatterbox-stack_chatterbox-api
 
 # View logs
-docker service logs -f chatterbox-stack_chatterbox-audiobook
+docker service logs -f chatterbox-stack_chatterbox-api
 
-# Test Web UI
-curl http://192.168.31.75:7861/
+# Test health endpoint
+curl http://192.168.31.75:4123/health
 
 # Test via Traefik (after proxy config)
-curl http://chatterbox.homelab.local
+curl http://chatterbox.homelab.local/health
 ```
 
 ## Usage
 
-### Web UI
+### API Endpoints
 
-Access the Gradio web interface at:
-- **Internal:** http://192.168.31.75:7861
-- **Via Traefik:** http://chatterbox.homelab.local (after proxy configuration)
+**Base URL:** http://192.168.31.75:4123
 
-#### Features:
-1. **Text to Speech** - Convert any text to natural-sounding audio
-2. **Voice Cloning** - Upload 5-60 seconds of audio to clone a voice
-3. **Audiobook Library** - Browse and download generated audiobooks
-
-### Voice Cloning
-
-**Best practices for voice cloning:**
-- Use 5-60 seconds of clear speech
-- WAV or MP3 format recommended
-- Minimal background noise
-- Consistent speaking style
-
-Place custom voice samples in:
+#### Basic Text-to-Speech
+```bash
+curl -X POST http://192.168.31.75:4123/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{"input": "Hello world!"}' \
+  --output speech.wav
 ```
-/data/docker/chatterbox/voices/
+
+#### Voice Cloning
+```bash
+curl -X POST http://192.168.31.75:4123/v1/audio/speech/upload \
+  -F "input=Hello with my voice!" \
+  -F "voice_file=@my_voice.mp3" \
+  --output custom_voice.wav
 ```
+
+#### Voice Library Management
+```bash
+# Upload voice to library
+curl -X POST http://192.168.31.75:4123/voices \
+  -F "voice_file=@my_voice.wav" \
+  -F "voice_name=my-custom-voice" \
+  -F "language=en"
+
+# List voices
+curl http://192.168.31.75:4123/voices
+
+# Use voice by name
+curl -X POST http://192.168.31.75:4123/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{"input": "Hello!", "voice": "my-custom-voice"}' \
+  --output output.wav
+```
+
+### Interactive Documentation
+
+Access the interactive API documentation:
+- **Swagger UI:** http://192.168.31.75:4123/docs
+- **ReDoc:** http://192.168.31.75:4123/redoc
+- **Via Traefik:** http://chatterbox.homelab.local/docs
 
 ## Configuration
 
@@ -113,48 +131,32 @@ Place custom voice samples in:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TZ` | `America/Sao_Paulo` | Timezone |
-| `NVIDIA_VISIBLE_DEVICES` | `all` | GPU devices to expose |
-| `NVIDIA_DRIVER_CAPABILITIES` | `compute,video,utility,graphics` | Driver features |
-| `GRADIO_SERVER_NAME` | `0.0.0.0` | Gradio server bind address |
-| `MODEL_NAME` | `resemble-ai/chatterbox-multilingual` | HuggingFace model |
+| `PORT` | `4123` | API server port |
+| `USE_MULTILINGUAL_MODEL` | `true` | Enable 22-language support |
+| `DEVICE` | `auto` | Device (auto/cuda/mps/cpu) |
+| `EXAGGERATION` | `0.5` | Emotion intensity (0.25-2.0) |
+| `TEMPERATURE` | `0.8` | Sampling randomness (0.05-5.0) |
+| `CFG_WEIGHT` | `0.5` | Pace control (0.0-1.0) |
 
 ### Volume Paths
 
 | Volume | Host Path | Purpose |
 |--------|-----------|---------|
-| `chatterbox-huggingface` | `/data/docker/chatterbox/huggingface` | HuggingFace model cache |
-| `chatterbox-voices` | `/data/docker/chatterbox/voices` | Custom voice profiles |
-| `/app/output` | `/media/audiobooks` | Generated audiobook files |
-
-## Build Details
-
-### Docker Image
-
-Uses **bhimrazy/chatterbox-tts** from Docker Hub:
-- Wraps Chatterbox TTS in a scalable API using LitServe
-- Supports zero-shot voice cloning and emotion control
-- MIT-licensed and production-ready
-
-The image is pulled automatically from Docker Hub during deployment:
-```bash
-docker stack deploy -c docker-compose.yml chatterbox-stack
-```
+| `chatterbox-models` | `/data/docker/chatterbox/models` | HuggingFace model cache |
+| `chatterbox-voices` | `/data/docker/chatterbox/voices` | Voice library |
+| `/app/output` | `/media/audiobooks` | Generated audio files |
 
 ## Resources
 
 ### Project Links
-- **Docker Image:** [bhimrazy/chatterbox-tts](https://hub.docker.com/r/bhimrazy/chatterbox-tts)
-- **Chatterbox Core:** [resemble-ai/chatterbox](https://github.com/resemble-ai/chatterbox)
+- **GitHub:** [travisvn/chatterbox-tts-api](https://github.com/travisvn/chatterbox-tts-api)
 - **Documentation:** [chatterboxtts.com/docs](https://chatterboxtts.com/docs)
+- **Docker Hub:** [travisvn/chatterbox-tts-api](https://hub.docker.com/r/travisvn/chatterbox-tts-api)
 
-### Related Projects
-- [devnen/Chatterbox-TTS-Server](https://github.com/devnen/Chatterbox-TTS-Server) - Alternative with OpenAI API
-- [dwain-barnes/chatterbox-streaming-api-docker](https://github.com/dwain-barnes/chatterbox-streaming-api-docker) - Streaming implementation
-
-### Articles
-- [Chatterbox vs ElevenLabs Comparison](https://www.resemble.ai/introducing-chatterbox-multilingual-open-source-tts-for-23-languages/)
-- [Best Open Source TTS Models 2025](https://www.resemble.ai/best-open-source-text-to-speech-models/)
+### API Documentation
+- [Complete API Reference](https://chatterboxtts.com/docs#api-endpoints)
+- [Voice Library Guide](https://chatterboxtts.com/docs#-voice-library-management)
+- [Multilingual Support](https://chatterboxtts.com/docs#-multilingual-support)
 
 ## Troubleshooting
 
@@ -165,7 +167,7 @@ docker stack deploy -c docker-compose.yml chatterbox-stack
 docker exec $(docker ps -q -f name=chatterbox) nvidia-smi
 
 # Check service logs
-docker service logs chatterbox-stack_chatterbox-audiobook
+docker service logs chatterbox-stack_chatterbox-api
 ```
 
 ### Service Not Starting
@@ -175,10 +177,7 @@ docker service logs chatterbox-stack_chatterbox-audiobook
 ls -la /data/docker/chatterbox/
 
 # Check resource constraints
-docker service inspect chatterbox-stack_chatterbox-audiobook | grep -A 10 "Resources"
-
-# Check build logs
-docker service logs chatterbox-stack_chatterbox-audiobook --tail 100
+docker service inspect chatterbox-stack_chatterbox-api | grep -A 10 "Resources"
 ```
 
 ### Poor Performance
@@ -188,17 +187,7 @@ docker service logs chatterbox-stack_chatterbox-audiobook --tail 100
 nvidia-smi dmon -s u
 
 # Check memory limits
-docker stats chatterbox-stack_chatterbox-audiobook
-```
-
-### Gradio UI Not Loading
-
-```bash
-# Check if Gradio is running
-docker service logs chatterbox-stack_chatterbox-audiobook | grep -i gradio
-
-# Verify port accessibility
-curl http://localhost:7860/
+docker stats chatterbox-stack_chatterbox-api
 ```
 
 ## Maintenance
@@ -207,7 +196,7 @@ curl http://localhost:7860/
 
 ```bash
 # Pull latest image
-docker pull bhimrazy/chatterbox-tts:latest
+docker pull travisvn/chatterbox-tts-api:latest
 
 # Redeploy
 cd stacks/chatterbox-stack
@@ -217,12 +206,12 @@ docker stack deploy -c docker-compose.yml chatterbox-stack
 ### Clean Model Cache
 
 ```bash
-# Remove cached HuggingFace models to free space
-sudo rm -rf /data/docker/chatterbox/huggingface/*
-docker service update --force chatterbox-stack_chatterbox-audiobook
+# Remove cached models to free space
+sudo rm -rf /data/docker/chatterbox/models/*
+docker service update --force chatterbox-stack_chatterbox-api
 ```
 
-### Backup Voice Profiles
+### Backup Voice Library
 
 ```bash
 # Backup custom voices
@@ -233,8 +222,8 @@ tar czf chatterbox-voices-backup-$(date +%Y%m%d).tar.gz \
 ---
 
 **Stack:** `chatterbox-stack`
-**Service:** `chatterbox-audiobook`
-**Image:** `bhimrazy/chatterbox-tts:latest` (Docker Hub)
+**Service:** `chatterbox-api`
+**Image:** `travisvn/chatterbox-tts-api:latest`
 **Placement:** `node.labels.gpu == true` (pop-os)
 **Network:** `homelab-net`
-**Port:** 7861 (published) / 8000 (container - LitServe API)
+**Port:** 4123 (FastAPI)

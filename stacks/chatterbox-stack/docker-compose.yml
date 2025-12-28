@@ -1,12 +1,12 @@
-# Chatterbox Audiobook Generator Stack
-# State-of-the-art open-source multilingual TTS for audiobook generation
-# Features: 23 languages, voice cloning, professional volume normalization
+# Chatterbox TTS API Stack
+# FastAPI-powered OpenAI-compatible TTS API with voice cloning
+# Based on: https://github.com/travisvn/chatterbox-tts-api
 
 version: '3.8'
 
 services:
-  chatterbox-audiobook:
-    image: chatterbox-audiobook:local
+  chatterbox-api:
+    image: travisvn/chatterbox-tts-api:latest
     deploy:
       replicas: 1
       placement:
@@ -14,55 +14,57 @@ services:
           - node.labels.gpu == true
       resources:
         limits:
-          memory: 16G
-        reservations:
           memory: 8G
+        reservations:
+          memory: 4G
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.chatterbox-audiobook.rule=Host(`chatterbox.homelab.local`)"
-        - "traefik.http.routers.chatterbox-audiobook.entrypoints=web"
-        - "traefik.http.services.chatterbox-audiobook.loadbalancer.server.port=7860"
+        - "traefik.http.routers.chatterbox.rule=Host(`chatterbox.homelab.local`)"
+        - "traefik.http.routers.chatterbox.entrypoints=web"
+        - "traefik.http.services.chatterbox.loadbalancer.server.port=4123"
     environment:
       - TZ=America/Sao_Paulo
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
-      - GRADIO_SERVER_NAME=0.0.0.0
+      - PORT=4123
+      - USE_MULTILINGUAL_MODEL=true
+      - DEVICE=cuda
     volumes:
       # HuggingFace cache for models
-      - chatterbox-huggingface:/root/.cache/huggingface
-      # Voice profiles for cloning
+      - chatterbox-models:/cache
+      # Voice library for cloned voices
       - chatterbox-voices:/app/voices
-      # Output directory for generated audiobooks
+      # Output directory for generated audio
       - /media/audiobooks:/app/output:rw
     networks:
       - homelab-net
     ports:
-      - target: 7860
-        published: 7861
+      - target: 4123
+        published: 4123
         protocol: tcp
         mode: host
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      test: ["CMD", "curl", "-f", "http://localhost:4123/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 120s
+      start_period: 60s
 
 networks:
   homelab-net:
     external: true
 
 volumes:
-  chatterbox-huggingface:
+  chatterbox-models:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /data/docker/chatterbox/huggingface
+      device: /data/docker/chatterbox/models
 
   chatterbox-voices:
     driver: local
