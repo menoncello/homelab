@@ -12,7 +12,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.storage == true
+          - node.labels.storage == true || node.hostname == pop-os
       resources:
         limits:
           memory: 2G
@@ -54,7 +54,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.storage == true
+          - node.labels.storage == true || node.hostname == pop-os
       resources:
         limits:
           memory: 3G
