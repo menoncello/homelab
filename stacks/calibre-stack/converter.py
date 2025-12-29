@@ -11,7 +11,7 @@ from pathlib import Path
 
 # Configuration
 CALIBRE_LIBRARY = "/calibre-library"
-CONVERT_FROM = ["pdf", "mobi", "azw3", "azw", "djvu", "txt", "rtf"]
+CONVERT_FROM = ["mobi", "azw3", "azw", "djvu", "txt", "rtf"]  # PDF excluded - poor conversion quality
 CONVERT_TO = "epub"
 
 def run_command(cmd):
