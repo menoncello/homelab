@@ -37,6 +37,9 @@ services:
         source: /media/downloads/books
         target: /cwa-book-ingest
       - type: bind
+        source: /media/books
+        target: /calibre-library
+      - type: bind
         source: /data/docker/calibre/config/gmail.json
         target: /app/calibre-web/gmail.json
     networks:
