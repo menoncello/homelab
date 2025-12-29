@@ -73,6 +73,9 @@ services:
       - type: bind
         source: /media/downloads/books
         target: /downloads
+      - type: bind
+        source: /data/docker/book-searcher/config/gmail.json
+        target: /app/calibre-web/gmail.json
     networks:
       - homelab-net
     ports:
