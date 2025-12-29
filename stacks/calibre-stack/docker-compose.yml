@@ -25,9 +25,17 @@ services:
       - PGID=1000
       - TZ=America/Sao_Paulo
       - CALIBRE_OVERRIDE_DATABASE_PATH=/books/metadata.db
+      - CALIBRE_CONFIG_DIRECTORY=/config/.config/calibre
     volumes:
-      - calibre-config:/config
-      - calibre-books:/books
+      - type: bind
+        source: /data/docker/calibre/config
+        target: /config
+      - type: bind
+        source: /media/books
+        target: /books
+      - type: bind
+        source: /media/downloads/books
+        target: /cwa-book-ingest
     networks:
       - homelab-net
     ports:
@@ -36,22 +44,44 @@ services:
         protocol: tcp
         mode: host
 
+  book-searcher:
+    image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
+    hostname: book-searcher
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 1G
+      restart_policy:
+        condition: any
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - CALIBRE_WEB_URL=http://192.168.31.75:8083
+      - INGEST_DIR=/downloads
+      - DOWNLOAD_TIMEOUT=300
+    volumes:
+      - type: bind
+        source: /data/docker/book-searcher/config
+        target: /config
+      - type: bind
+        source: /media/downloads/books
+        target: /downloads
+    networks:
+      - homelab-net
+    ports:
+      - target: 8084
+        published: 8084
+        protocol: tcp
+        mode: host
+
 networks:
   homelab-net:
     external: true
     name: homelab-net
-
-volumes:
-  calibre-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /srv/docker/calibre/config
-
-  calibre-books:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /srv/docker/books

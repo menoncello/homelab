@@ -80,7 +80,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /media/books
+      device: /media/downloads/books
 
   stacks-logs:
     driver: local

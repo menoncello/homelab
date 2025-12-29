@@ -36,7 +36,8 @@ services:
     volumes:
       - /data/docker/lazylibrarian:/config
       - /media/incomplete:/downloads
-      - /media/audiobooks:/books
+      - /media/audiobooks:/audiobooks
+      - /media/downloads/books:/books
     networks:
       - homelab-net
     ports:
