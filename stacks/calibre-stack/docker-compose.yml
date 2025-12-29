@@ -87,6 +87,44 @@ services:
         protocol: tcp
         mode: host
 
+  # Converter service - converts existing books to EPUB
+  # Scale to 1 to run: docker service scale calibre_converter=1
+  # Runs once and exits, no auto-restart
+  converter:
+    image: crocodilestick/calibre-web-automated:latest
+    hostname: converter
+    deploy:
+      replicas: 0
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: none
+    command: >
+      sh -c "
+        echo 'Starting EPUB conversion...' &&
+        python3 /scripts/converter.py &&
+        echo 'Conversion complete. Exiting.'
+      "
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - type: bind
+        source: /media/books
+        target: /calibre-library
+      - type: bind
+        source: /Users/menoncello/repos/setup/homelab/stacks/calibre-stack/converter.py
+        target: /scripts/converter.py
+    networks:
+      - homelab-net
+
 networks:
   homelab-net:
     external: true
