@@ -4,7 +4,7 @@ Stacks is a lightweight download manager for Anna's Archive (books, comics, maga
 
 ## Access
 
-- **URL:** http://192.168.31.208:7788
+- **URL:** http://192.168.31.6:7788
 - **Default credentials:**
   - Username: `admin`
   - Password: `admin123` (change after first login!)
@@ -21,7 +21,7 @@ Stacks is a lightweight download manager for Anna's Archive (books, comics, maga
 
 ```bash
 # 1. Create volume directories (on Xeon01)
-ssh eduardo@192.168.31.208
+ssh eduardo@192.168.31.6
 sudo mkdir -p /srv/docker/stacks/{config,logs}
 sudo mkdir -p /srv/docker/books
 sudo chown -R 1000:1000 /srv/docker/stacks
@@ -64,7 +64,7 @@ Stacks downloads to `/srv/docker/books` - the same folder Kavita reads from!
 ## FlareSolverr
 
 FlareSolverr is included to bypass Cloudflare/DDoS-Guard protection on mirror sites:
-- Access: http://192.168.31.208:8191
+- Access: http://192.168.31.6:8191
 - Automatically configured in Stacks
 - Required for reliable mirror downloads
 

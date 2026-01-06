@@ -11,7 +11,7 @@ import sys
 from urllib.parse import urljoin
 
 # Configuration from environment variables
-HOMARR_URL = os.getenv("HOMARR_URL", "http://192.168.31.75:7575")
+HOMARR_URL = os.getenv("HOMARR_URL", "http://192.168.31.5:7575")
 API_KEY = os.getenv("HOMARR_API_KEY", "")
 
 # Headers for API requests
@@ -35,36 +35,36 @@ CATEGORIES = [
 # Apps to create
 APPS = [
     # Media
-    {"name": "Jellyfin", "url": "http://192.168.31.75:8096", "category": "Media", "icon": "jellyfin"},
-    {"name": "Audiobookshelf", "url": "http://192.168.31.75:8080", "category": "Media", "icon": "audiobookshelf"},
+    {"name": "Jellyfin", "url": "http://192.168.31.5:8096", "category": "Media", "icon": "jellyfin"},
+    {"name": "Audiobookshelf", "url": "http://192.168.31.5:8080", "category": "Media", "icon": "audiobookshelf"},
 
     # Automation
-    {"name": "Sonarr", "url": "http://192.168.31.75:8989", "category": "Automation", "icon": "sonarr"},
-    {"name": "Radarr", "url": "http://192.168.31.75:7878", "category": "Automation", "icon": "radarr"},
-    {"name": "Lidarr", "url": "http://192.168.31.75:8686", "category": "Automation", "icon": "lidarr"},
-    {"name": "Bazarr", "url": "http://192.168.31.75:6767", "category": "Automation", "icon": "bazarr"},
-    {"name": "Prowlarr", "url": "http://192.168.31.75:9696", "category": "Automation", "icon": "prowlarr"},
-    {"name": "Jackett", "url": "http://192.168.31.75:9117", "category": "Automation", "icon": "jackett"},
+    {"name": "Sonarr", "url": "http://192.168.31.5:8989", "category": "Automation", "icon": "sonarr"},
+    {"name": "Radarr", "url": "http://192.168.31.5:7878", "category": "Automation", "icon": "radarr"},
+    {"name": "Lidarr", "url": "http://192.168.31.5:8686", "category": "Automation", "icon": "lidarr"},
+    {"name": "Bazarr", "url": "http://192.168.31.5:6767", "category": "Automation", "icon": "bazarr"},
+    {"name": "Prowlarr", "url": "http://192.168.31.5:9696", "category": "Automation", "icon": "prowlarr"},
+    {"name": "Jackett", "url": "http://192.168.31.5:9117", "category": "Automation", "icon": "jackett"},
 
     # Books
-    {"name": "Kavita", "url": "http://192.168.31.75:5000", "category": "Books", "icon": "kavita"},
-    {"name": "Listenarr", "url": "http://192.168.31.75:8988", "category": "Books", "icon": "listenarr"},
-    {"name": "LazyLibrarian", "url": "http://192.168.31.75:5299", "category": "Books", "icon": "lazylibrarian"},
+    {"name": "Kavita", "url": "http://192.168.31.5:5000", "category": "Books", "icon": "kavita"},
+    {"name": "Listenarr", "url": "http://192.168.31.5:8988", "category": "Books", "icon": "listenarr"},
+    {"name": "LazyLibrarian", "url": "http://192.168.31.5:5299", "category": "Books", "icon": "lazylibrarian"},
 
     # Requests
-    {"name": "Jellyseerr", "url": "http://192.168.31.75:5055", "category": "Requests", "icon": "jellyseerr"},
-    {"name": "AudioBookRequest", "url": "http://192.168.31.75:8000", "category": "Requests", "icon": "audiobook"},
+    {"name": "Jellyseerr", "url": "http://192.168.31.5:5055", "category": "Requests", "icon": "jellyseerr"},
+    {"name": "AudioBookRequest", "url": "http://192.168.31.5:8000", "category": "Requests", "icon": "audiobook"},
 
     # Downloads
-    {"name": "qBittorrent", "url": "http://192.168.31.75:9091", "category": "Downloads", "icon": "qbittorrent"},
+    {"name": "qBittorrent", "url": "http://192.168.31.5:9091", "category": "Downloads", "icon": "qbittorrent"},
 
     # Infrastructure
-    {"name": "Nginx Proxy Manager", "url": "http://192.168.31.75:81", "category": "Infrastructure", "icon": "nginx"},
-    {"name": "Pi-hole", "url": "http://192.168.31.75:8053", "category": "Infrastructure", "icon": "pihole"},
+    {"name": "Nginx Proxy Manager", "url": "http://192.168.31.5:81", "category": "Infrastructure", "icon": "nginx"},
+    {"name": "Pi-hole", "url": "http://192.168.31.5:8053", "category": "Infrastructure", "icon": "pihole"},
 
     # Tools
-    {"name": "n8n", "url": "http://192.168.31.75:5678", "category": "Tools", "icon": "n8n"},
-    {"name": "ebook2audiobook", "url": "http://192.168.31.75:7860", "category": "Tools", "icon": "book"},
+    {"name": "n8n", "url": "http://192.168.31.5:5678", "category": "Tools", "icon": "n8n"},
+    {"name": "ebook2audiobook", "url": "http://192.168.31.5:7860", "category": "Tools", "icon": "book"},
 ]
 
 

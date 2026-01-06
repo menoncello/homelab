@@ -94,7 +94,7 @@
     {
       "id": "1",
       "name": "Jellyfin",
-      "url": "http://192.168.31.75:8096",
+      "url": "http://192.168.31.5:8096",
       "icon": "/icons/jellyfin.png",
       "appearance": {
         "iconSize": "medium",
@@ -128,7 +128,7 @@
     {
       "id": "2",
       "name": "Audiobookshelf",
-      "url": "http://192.168.31.75:8080",
+      "url": "http://192.168.31.5:8080",
       "icon": "/icons/audiobookshelf.png",
       "appearance": {
         "iconSize": "medium",
@@ -162,7 +162,7 @@
     {
       "id": "3",
       "name": "Kavita",
-      "url": "http://192.168.31.75:5000",
+      "url": "http://192.168.31.5:5000",
       "icon": "/icons/kavita.png",
       "appearance": {
         "iconSize": "medium",
@@ -196,7 +196,7 @@
     {
       "id": "4",
       "name": "Sonarr",
-      "url": "http://192.168.31.75:8989",
+      "url": "http://192.168.31.5:8989",
       "icon": "/icons/sonarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -239,7 +239,7 @@
     {
       "id": "5",
       "name": "Radarr",
-      "url": "http://192.168.31.75:7878",
+      "url": "http://192.168.31.5:7878",
       "icon": "/icons/radarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -282,7 +282,7 @@
     {
       "id": "6",
       "name": "Lidarr",
-      "url": "http://192.168.31.75:8686",
+      "url": "http://192.168.31.5:8686",
       "icon": "/icons/lidarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -325,7 +325,7 @@
     {
       "id": "7",
       "name": "Bazarr",
-      "url": "http://192.168.31.75:6767",
+      "url": "http://192.168.31.5:6767",
       "icon": "/icons/bazarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -359,7 +359,7 @@
     {
       "id": "8",
       "name": "Prowlarr",
-      "url": "http://192.168.31.75:9696",
+      "url": "http://192.168.31.5:9696",
       "icon": "/icons/prowlarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -393,7 +393,7 @@
     {
       "id": "9",
       "name": "Jackett",
-      "url": "http://192.168.31.75:9117",
+      "url": "http://192.168.31.5:9117",
       "icon": "/icons/jackett.png",
       "appearance": {
         "iconSize": "medium",
@@ -427,7 +427,7 @@
     {
       "id": "10",
       "name": "Listenarr",
-      "url": "http://192.168.31.75:8988",
+      "url": "http://192.168.31.5:8988",
       "icon": "/icons/listenarr.png",
       "appearance": {
         "iconSize": "medium",
@@ -461,7 +461,7 @@
     {
       "id": "11",
       "name": "LazyLibrarian",
-      "url": "http://192.168.31.75:5299",
+      "url": "http://192.168.31.5:5299",
       "icon": "/icons/lazylibrarian.png",
       "appearance": {
         "iconSize": "medium",
@@ -495,7 +495,7 @@
     {
       "id": "12",
       "name": "Jellyseerr",
-      "url": "http://192.168.31.75:5055",
+      "url": "http://192.168.31.5:5055",
       "icon": "/icons/jellyseerr.png",
       "appearance": {
         "iconSize": "medium",
@@ -538,7 +538,7 @@
     {
       "id": "13",
       "name": "AudioBookRequest",
-      "url": "http://192.168.31.75:8000",
+      "url": "http://192.168.31.5:8000",
       "icon": "/icons/audiobooks.png",
       "appearance": {
         "iconSize": "medium",
@@ -572,7 +572,7 @@
     {
       "id": "14",
       "name": "qBittorrent",
-      "url": "http://192.168.31.75:9091",
+      "url": "http://192.168.31.5:9091",
       "icon": "/icons/qbittorrent.png",
       "appearance": {
         "iconSize": "medium",
@@ -615,7 +615,7 @@
     {
       "id": "15",
       "name": "Nginx Proxy Manager",
-      "url": "http://192.168.31.75:81",
+      "url": "http://192.168.31.5:81",
       "icon": "/icons/nginx.png",
       "appearance": {
         "iconSize": "medium",
@@ -649,7 +649,7 @@
     {
       "id": "16",
       "name": "Pi-hole",
-      "url": "http://192.168.31.75:8053",
+      "url": "http://192.168.31.5:8053",
       "icon": "/icons/pihole.png",
       "appearance": {
         "iconSize": "medium",
@@ -692,7 +692,7 @@
     {
       "id": "17",
       "name": "n8n",
-      "url": "http://192.168.31.75:5678",
+      "url": "http://192.168.31.5:5678",
       "icon": "/icons/n8n.png",
       "appearance": {
         "iconSize": "medium",
@@ -726,7 +726,7 @@
     {
       "id": "18",
       "name": "ebook2audiobook",
-      "url": "http://192.168.31.75:7860",
+      "url": "http://192.168.31.5:7860",
       "icon": "/icons/book.png",
       "appearance": {
         "iconSize": "medium",

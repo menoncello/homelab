@@ -5,7 +5,7 @@
 O Samba está configurado para compartilhar `/media` do Helios via rede SMB.
 
 **Detalhes do Compartilhamento:**
-- **Servidor:** 192.168.31.75 (Helios)
+- **Servidor:** 192.168.31.5 (Helios)
 - **Share:** `media`
 - **Usuário:** `eduardo`
 - **Portas:** 139, 445 (TCP), 137, 138 (UDP)
@@ -16,7 +16,7 @@ O Samba está configurado para compartilhar `/media` do Helios via rede SMB.
 
 1. Abra o **Finder**
 2. Pressione `Cmd + K` (ou Ir → Conectar ao Servidor)
-3. Digite: `smb://192.168.31.75`
+3. Digite: `smb://192.168.31.5`
 4. Clique em **Conectar**
 5. Selecione o share `media`
 6. Entre com usuário `eduardo` e senha (configurada no `.env`)
@@ -46,7 +46,7 @@ sudo vifs
 
 **3. Adicionar esta linha:**
 ```
-/media -fstype=smbfs,rw ://eduardo:PASSWORD@192.168.31.75/media
+/media -fstype=smbfs,rw ://eduardo:PASSWORD@192.168.31.5/media
 ```
 (Substitua `PASSWORD` pela senha real)
 
@@ -81,7 +81,7 @@ sudo vifs
 
 Adicionar:
 ```
-//192.168.31.75/media /Volumes/media smbfs rw,soft,noatime,nodev,nosuid,-N ~/.smbcreds 0 0
+//192.168.31.5/media /Volumes/media smbfs rw,soft,noatime,nodev,nosuid,-N ~/.smbcreds 0 0
 ```
 
 **4. Mount:**
@@ -95,10 +95,10 @@ sudo mount -a
 
 ```bash
 # Listar shares
-smbclient -L 192.168.31.75 -U eduardo
+smbclient -L 192.168.31.5 -U eduardo
 
 # Acessar share interativo
-smbclient //192.168.31.75/media -U eduardo
+smbclient //192.168.31.5/media -U eduardo
 
 # Comandos dentro do smbclient:
 # ls, cd, get, put, mkdir, rmdir
@@ -108,7 +108,7 @@ smbclient //192.168.31.75/media -U eduardo
 
 ```bash
 # Mount manual
-mount -t smbfs //eduardo:PASSWORD@192.168.31.75/media /Volumes/media
+mount -t smbfs //eduardo:PASSWORD@192.168.31.5/media /Volumes/media
 
 # Unmount
 umount /Volumes/media
@@ -138,8 +138,8 @@ docker service logs samba-stack_samba
 
 2. Teste conectividade:
 ```bash
-ping 192.168.31.75
-telnet 192.168.31.75 445
+ping 192.168.31.5
+telnet 192.168.31.5 445
 ```
 
 3. Verifique portas abertas no Helios:
@@ -157,7 +157,7 @@ cat stacks/samba-stack/.env | grep SAMBA_PASSWORD
 
 2. Teste autenticação:
 ```bash
-smbclient //192.168.31.75/media -U eduardo
+smbclient //192.168.31.5/media -U eduardo
 ```
 
 ### Performance lenta
@@ -166,7 +166,7 @@ Para melhor performance, use SMB3:
 
 ```bash
 # Mount com SMB3
-mount -t smbfs -o vers=3.0 //eduardo:PASSWORD@192.168.31.75/media /Volumes/media
+mount -t smbfs -o vers=3.0 //eduardo:PASSWORD@192.168.31.5/media /Volumes/media
 ```
 
 ### Permissões negadas

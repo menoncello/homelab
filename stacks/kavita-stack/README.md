@@ -4,7 +4,7 @@ Kavita is a fast, feature-rich, cross platform reading server. Built with the go
 
 ## Access
 
-- **URL:** http://192.168.31.75:5000
+- **URL:** http://192.168.31.5:5000
 - **Default credentials:** Create admin account on first launch
 
 ## Features

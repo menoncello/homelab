@@ -20,7 +20,7 @@ Homelab com 2 servidores em rede 2.5Gbps, conexão fibra 600/200 Mbps.
 - **Função:** Docker Swarm Manager + Serviços GPU
 
 **Rede:**
-- **IP:** 192.168.31.75
+- **IP:** 192.168.31.5
 - **Interface:** [Identificar interface 2.5G]
 - **Porta Docker API:** 2375 (TCP)
 
@@ -38,10 +38,10 @@ Homelab com 2 servidores em rede 2.5Gbps, conexão fibra 600/200 Mbps.
 **Acesso:**
 ```bash
 # SSH
-ssh eduardo@192.168.31.75
+ssh eduardo@192.168.31.5
 
 # Docker Remoto
-export DOCKER_HOST="tcp://192.168.31.75:2375"
+export DOCKER_HOST="tcp://192.168.31.5:2375"
 # ou
 docker context use homelab
 ```
@@ -60,7 +60,7 @@ docker context use homelab
 - **Função:** Docker Swarm Worker
 
 **Rede:**
-- **IP:** 192.168.31.208
+- **IP:** 192.168.31.6
 - **Interface:** [Identificar interface]
 - **Porta Docker API:** Acesso via manager (Swarm)
 
@@ -77,7 +77,7 @@ docker context use homelab
 **Acesso:**
 ```bash
 # SSH
-ssh eduardo@192.168.31.208
+ssh eduardo@192.168.31.6
 
 # Docker (via manager)
 docker context use homelab
@@ -93,8 +93,8 @@ docker node ls
 Internet (600/200 Fibra)
     ↓
 Roteador/Switch 2.5Gbps
-    ├── Helios (192.168.31.75) - Manager
-    └── Xeon01 (192.168.31.208) - Worker
+    ├── Helios (192.168.31.5) - Manager
+    └── Xeon01 (192.168.31.6) - Worker
 ```
 
 ### Portas Configuradas
@@ -106,26 +106,26 @@ Roteador/Switch 2.5Gbps
 | Overlay Network | 4789 | UDP | Tráfego de rede overlay |
 | SSH | 22 | TCP | Acesso remoto |
 
-### Portas dos Serviços (Helios - 192.168.31.75)
+### Portas dos Serviços (Helios - 192.168.31.5)
 | Serviço | Porta | URL |
 |---------|-------|-----|
-| Jellyfin | 8096 | http://192.168.31.75:8096 |
-| Sonarr | 8989 | http://192.168.31.75:8989 |
-| Radarr | 7878 | http://192.168.31.75:7878 |
-| Lidarr | 8686 | http://192.168.31.75:8686 |
-| Transmission | 9091 | http://192.168.31.75:9091 |
-| Homarr | 7575 | http://192.168.31.75:7575 |
-| Nginx Proxy Manager | 81 | http://192.168.31.75:81 |
-| Pi-hole (Web) | 8053 | http://192.168.31.75:8053/admin |
+| Jellyfin | 8096 | http://192.168.31.5:8096 |
+| Sonarr | 8989 | http://192.168.31.5:8989 |
+| Radarr | 7878 | http://192.168.31.5:7878 |
+| Lidarr | 8686 | http://192.168.31.5:8686 |
+| Transmission | 9091 | http://192.168.31.5:9091 |
+| Homarr | 7575 | http://192.168.31.5:7575 |
+| Nginx Proxy Manager | 81 | http://192.168.31.5:81 |
+| Pi-hole (Web) | 8053 | http://192.168.31.5:8053/admin |
 
-### Portas dos Serviços (Xeon01 - 192.168.31.208)
+### Portas dos Serviços (Xeon01 - 192.168.31.6)
 | Serviço | Porta | URL |
 |---------|-------|-----|
-| Nextcloud | 8080 | http://192.168.31.208:8080 |
-| Audiobookshelf | 80 | http://192.168.31.208:80 |
-| n8n | 5678 | http://192.168.31.208:5678 |
-| Kavita | 5000 | http://192.168.31.208:5000 |
-| Stacks | 7788 | http://192.168.31.208:7788 |
+| Nextcloud | 8080 | http://192.168.31.6:8080 |
+| Audiobookshelf | 80 | http://192.168.31.6:80 |
+| n8n | 5678 | http://192.168.31.6:5678 |
+| Kavita | 5000 | http://192.168.31.6:5000 |
+| Stacks | 7788 | http://192.168.31.6:7788 |
 
 ### Rede Docker Swarm
 - **Rede Overlay:** homelab-net (criada para comunicação interna)
@@ -212,8 +212,8 @@ docker node inspect xeon01
 docker info --format '{{.Swarm}}'
 
 # Testar conectividade
-ping -c 3 192.168.31.75
-telnet 192.168.31.75 2375
+ping -c 3 192.168.31.5
+telnet 192.168.31.5 2375
 ```
 
 ---
@@ -223,11 +223,11 @@ telnet 192.168.31.75 2375
 ### Do Computador Local
 ```bash
 # Usando Docker Context
-docker context update homelab --docker "host=ssh://eduardo@192.168.31.75:2375"
+docker context update homelab --docker "host=ssh://eduardo@192.168.31.5:2375"
 docker context use homelab
 
 # Variável de ambiente
-export DOCKER_HOST="tcp://192.168.31.75:2375"
+export DOCKER_HOST="tcp://192.168.31.5:2375"
 docker ps
 ```
 

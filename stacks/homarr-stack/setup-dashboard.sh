@@ -17,7 +17,7 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     export $(grep -v '^#' "$SCRIPT_DIR/.env" | xargs)
 fi
 
-HOMARR_URL="${HOMARR_URL:-http://192.168.31.75:7575}"
+HOMARR_URL="${HOMARR_URL:-http://192.168.31.5:7575}"
 
 echo -e "${GREEN}======================================${NC}"
 echo -e "${GREEN}Homarr Dashboard Setup${NC}"

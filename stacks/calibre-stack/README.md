@@ -4,7 +4,7 @@ All-in-one ebook manager with Anna's Archive integration. Search, download, and 
 
 ## Access
 
-- **URL:** http://192.168.31.208:8083
+- **URL:** http://192.168.31.6:8083
 - **Default credentials:**
   - Username: `admin`
   - Password: `admin123` (change after first login)
@@ -22,7 +22,7 @@ All-in-one ebook manager with Anna's Archive integration. Search, download, and 
 
 ```bash
 # 1. Create volume directories (on Xeon01)
-ssh eduardo@192.168.31.208
+ssh eduardo@192.168.31.6
 sudo mkdir -p /srv/docker/calibre/config
 sudo mkdir -p /srv/docker/books
 sudo chown -R 1000:1000 /srv/docker/calibre
@@ -44,7 +44,7 @@ docker service logs -f calibre_calibre
 
 ### First Launch
 
-1. Access http://192.168.31.208:8083
+1. Access http://192.168.31.6:8083
 2. Default login: `admin` / `admin123`
 3. Click **"Basic Configuration"** → **"Feature Configuration"**
 4. Enable **"Automated Download"**
@@ -81,7 +81,7 @@ If you have an Anna's Archive donation key:
 ## Mobile Access
 
 Calibre-Web supports OPDS - add to your mobile e-reader app:
-- URL: `http://192.168.31.208:8083/opds`
+- URL: `http://192.168.31.6:8083/opds`
 - Supports: Chunky Ebook Reader, KyBook 3, Marvin, etc.
 
 ## Tips

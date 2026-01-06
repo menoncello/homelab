@@ -4,7 +4,7 @@ n8n is a workflow automation tool that helps you connect different apps and serv
 
 ## Access
 
-- **URL:** http://192.168.31.208:5678
+- **URL:** http://192.168.31.6:5678
 - **Default:** Create admin account on first launch
 
 ## First Time Setup
@@ -41,7 +41,7 @@ openssl rand -hex 32 > n8n_encryption_key.txt
 ### 3. Create volume directories (on Xeon01)
 
 ```bash
-ssh eduardo@192.168.31.208
+ssh eduardo@192.168.31.6
 sudo mkdir -p /srv/docker/n8n
 sudo chown -R 1000:1000 /srv/docker/n8n
 ```

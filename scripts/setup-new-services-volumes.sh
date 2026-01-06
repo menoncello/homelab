@@ -1,6 +1,6 @@
 #!/bin/bash
 # Setup script for new homelab services volumes
-# Run on BOTH Helios (192.168.31.75) and Xeon01 (192.168.31.208)
+# Run on BOTH Helios (192.168.31.5) and Xeon01 (192.168.31.6)
 
 set -e
 
@@ -15,7 +15,7 @@ IP=$(hostname -I | awk '{print $1}')
 
 # Functions for each server
 setup_helios() {
-    echo "==> Setting up Helios volumes (192.168.31.75)..."
+    echo "==> Setting up Helios volumes (192.168.31.5)..."
 
     # Homarr
     echo "  -> Creating Homarr volumes..."
@@ -41,7 +41,7 @@ setup_helios() {
 }
 
 setup_xeon01() {
-    echo "==> Setting up Xeon01 volumes (192.168.31.208)..."
+    echo "==> Setting up Xeon01 volumes (192.168.31.6)..."
 
     # PostgreSQL
     echo "  -> Creating PostgreSQL volumes..."
@@ -79,12 +79,12 @@ setup_xeon01() {
 }
 
 # Main logic
-if [[ "$IP" == "192.168.31.75" ]] || [[ "$IP" == "192.168.31.237" ]] || [[ "$HOSTNAME" == "helios" ]] || [[ "$HOSTNAME" == "pop-os" ]]; then
+if [[ "$IP" == "192.168.31.5" ]] || [[ "$IP" == "192.168.31.237" ]] || [[ "$HOSTNAME" == "helios" ]] || [[ "$HOSTNAME" == "pop-os" ]]; then
     setup_helios
-elif [[ "$IP" == "192.168.31.208" ]] || [[ "$HOSTNAME" == "xeon01" ]]; then
+elif [[ "$IP" == "192.168.31.6" ]] || [[ "$HOSTNAME" == "xeon01" ]]; then
     setup_xeon01
 else
-    echo "ERROR: Unknown server. Please run on Helios (192.168.31.75) or Xeon01 (192.168.31.208)"
+    echo "ERROR: Unknown server. Please run on Helios (192.168.31.5) or Xeon01 (192.168.31.6)"
     exit 1
 fi
 

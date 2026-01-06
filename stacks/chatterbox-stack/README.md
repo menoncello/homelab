@@ -76,7 +76,7 @@ docker service ps chatterbox-stack_chatterbox-api
 docker service logs -f chatterbox-stack_chatterbox-api
 
 # Test health endpoint
-curl http://192.168.31.75:5123/health
+curl http://192.168.31.5:5123/health
 
 # Test via Traefik (after proxy config)
 curl http://chatterbox.homelab.local/health
@@ -86,11 +86,11 @@ curl http://chatterbox.homelab.local/health
 
 ### API Endpoints
 
-**Base URL:** http://192.168.31.75:5123
+**Base URL:** http://192.168.31.5:5123
 
 #### Basic Text-to-Speech
 ```bash
-curl -X POST http://192.168.31.75:5123/v1/audio/speech \
+curl -X POST http://192.168.31.5:5123/v1/audio/speech \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello world!"}' \
   --output speech.wav
@@ -98,7 +98,7 @@ curl -X POST http://192.168.31.75:5123/v1/audio/speech \
 
 #### Voice Cloning
 ```bash
-curl -X POST http://192.168.31.75:5123/v1/audio/speech/upload \
+curl -X POST http://192.168.31.5:5123/v1/audio/speech/upload \
   -F "input=Hello with my voice!" \
   -F "voice_file=@my_voice.mp3" \
   --output custom_voice.wav
@@ -107,16 +107,16 @@ curl -X POST http://192.168.31.75:5123/v1/audio/speech/upload \
 #### Voice Library Management
 ```bash
 # Upload voice to library
-curl -X POST http://192.168.31.75:5123/voices \
+curl -X POST http://192.168.31.5:5123/voices \
   -F "voice_file=@my_voice.wav" \
   -F "voice_name=my-custom-voice" \
   -F "language=en"
 
 # List voices
-curl http://192.168.31.75:5123/voices
+curl http://192.168.31.5:5123/voices
 
 # Use voice by name
-curl -X POST http://192.168.31.75:5123/v1/audio/speech \
+curl -X POST http://192.168.31.5:5123/v1/audio/speech \
   -H "Content-Type: application/json" \
   -d '{"input": "Hello!", "voice": "my-custom-voice"}' \
   --output output.wav
@@ -125,8 +125,8 @@ curl -X POST http://192.168.31.75:5123/v1/audio/speech \
 ### Interactive Documentation
 
 Access the interactive API documentation:
-- **Swagger UI:** http://192.168.31.75:5123/docs
-- **ReDoc:** http://192.168.31.75:5123/redoc
+- **Swagger UI:** http://192.168.31.5:5123/docs
+- **ReDoc:** http://192.168.31.5:5123/redoc
 - **Via Traefik:** http://chatterbox.homelab.local/docs
 
 ## Configuration

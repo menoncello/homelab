@@ -16,18 +16,18 @@ config();
 
 const CONFIG = {
   jackett: {
-    url: process.env.JACKETT_URL || "http://192.168.31.75:9117",
+    url: process.env.JACKETT_URL || "http://192.168.31.5:9117",
   },
   sonarr: {
-    url: process.env.SONARR_URL || "http://192.168.31.75:8989",
+    url: process.env.SONARR_URL || "http://192.168.31.5:8989",
     apiKey: process.env.SONARR_API_KEY || "",
   },
   radarr: {
-    url: process.env.RADARR_URL || "http://192.168.31.75:7878",
+    url: process.env.RADARR_URL || "http://192.168.31.5:7878",
     apiKey: process.env.RADARR_API_KEY || "",
   },
   listenarr: {
-    url: process.env.LISTENARR_URL || "http://192.168.31.75:8988",
+    url: process.env.LISTENARR_URL || "http://192.168.31.5:8988",
     apiKey: process.env.LISTENARR_API_KEY || "",
   },
   // Set to true to test without actually adding

@@ -9,7 +9,7 @@
 # - Automatic metadata fetching
 # - Podcast support
 # - Mobile app support (Booksonic app)
-
+:K
 version: '3.8'
 
 services:

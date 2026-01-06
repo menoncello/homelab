@@ -124,9 +124,9 @@ environment:
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| Kavita | http://192.168.31.208:5000 | Read ebooks/comics |
-| Stacks | http://192.168.31.208:7788 | Download manager UI |
-| FlareSolverr | http://192.168.31.208:8191 | Cloudflare bypass |
+| Kavita | http://192.168.31.6:5000 | Read ebooks/comics |
+| Stacks | http://192.168.31.6:7788 | Download manager UI |
+| FlareSolverr | http://192.168.31.6:8191 | Cloudflare bypass |
 
 ## Integration Flow
 

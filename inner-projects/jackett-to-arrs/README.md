@@ -30,12 +30,12 @@ Sync all configured Jackett indexers to Sonarr, Radarr, and Listenarr automatica
 
 4. **Edit `.env` and add your API keys:**
    ```env
-   JACKETT_URL=http://192.168.31.75:9117
-   SONARR_URL=http://192.168.31.75:8989
+   JACKETT_URL=http://192.168.31.5:9117
+   SONARR_URL=http://192.168.31.5:8989
    SONARR_API_KEY=your_sonarr_api_key_here
-   RADARR_URL=http://192.168.31.75:7878
+   RADARR_URL=http://192.168.31.5:7878
    RADARR_API_KEY=your_radarr_api_key_here
-   LISTENARR_URL=http://192.168.31.75:8988
+   LISTENARR_URL=http://192.168.31.5:8988
    LISTENARR_API_KEY=your_listenarr_api_key_here
    ```
 
@@ -74,12 +74,12 @@ All configuration is done via environment variables in `.env`:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `JACKETT_URL` | No | `http://192.168.31.75:9117` | Jackett URL |
-| `SONARR_URL` | No | `http://192.168.31.75:8989` | Sonarr URL |
+| `JACKETT_URL` | No | `http://192.168.31.5:9117` | Jackett URL |
+| `SONARR_URL` | No | `http://192.168.31.5:8989` | Sonarr URL |
 | `SONARR_API_KEY` | No* | - | Sonarr API key |
-| `RADARR_URL` | No | `http://192.168.31.75:7878` | Radarr URL |
+| `RADARR_URL` | No | `http://192.168.31.5:7878` | Radarr URL |
 | `RADARR_API_KEY` | No* | - | Radarr API key |
-| `LISTENARR_URL` | No | `http://192.168.31.75:8988` | Listenarr URL |
+| `LISTENARR_URL` | No | `http://192.168.31.5:8988` | Listenarr URL |
 | `LISTENARR_API_KEY` | No* | - | Listenarr API key |
 | `DRY_RUN` | No | `false` | Test without adding |
 

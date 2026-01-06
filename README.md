@@ -5,11 +5,11 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
 ## Architecture
 
 **Servers:**
-- **Helios** (192.168.31.75) - Manager Node, GPU services
+- **Helios** (192.168.31.5) - Manager Node, GPU services
   - i7 11th gen, 64GB RAM, RTX 3070ti Mobile
   - Storage: `/data` (337.8GB), `/media` (955.6GB), `/srv` (444.5GB)
 
-- **Xeon01** (192.168.31.208) - Worker Node, storage-intensive services
+- **Xeon01** (192.168.31.6) - Worker Node, storage-intensive services
   - Xeon E5-2686, 96GB RAM
   - Storage: `/srv` (434.1GB), `/home` (793.8GB)
 
@@ -37,7 +37,7 @@ Complete Docker Swarm-based homelab infrastructure for media streaming, content 
    docker swarm init
 
    # On Xeon01 (worker)
-   docker swarm join --token [token] 192.168.31.75:2377
+   docker swarm join --token [token] 192.168.31.5:2377
    ```
 
 ## Quick Start
@@ -98,25 +98,25 @@ docker stack deploy -c stacks/stacks-stack/docker-compose.yml stacks
 After deployment:
 
 **Dashboard & Management:**
-- **Homarr:** http://192.168.31.75:7575 - Dashboard for all services
-- **Nginx Proxy Manager:** http://192.168.31.75:81 - Reverse proxy (admin@example.com / changeme)
-- **Pi-hole:** http://192.168.31.75:8053/admin - DNS with ad blocking (piholeadmin2024)
+- **Homarr:** http://192.168.31.5:7575 - Dashboard for all services
+- **Nginx Proxy Manager:** http://192.168.31.5:81 - Reverse proxy (admin@example.com / changeme)
+- **Pi-hole:** http://192.168.31.5:8053/admin - DNS with ad blocking (piholeadmin2024)
 
 **Media:**
-- **Jellyfin:** http://192.168.31.75:8096 - Media server with GPU transcoding
-- **Sonarr:** http://192.168.31.75:8989 - TV series automation
-- **Radarr:** http://192.168.31.75:7878 - Movie automation
-- **Lidarr:** http://192.168.31.75:8686 - Music automation
-- **Transmission:** http://192.168.31.75:9091 - Torrent downloads
+- **Jellyfin:** http://192.168.31.5:8096 - Media server with GPU transcoding
+- **Sonarr:** http://192.168.31.5:8989 - TV series automation
+- **Radarr:** http://192.168.31.5:7878 - Movie automation
+- **Lidarr:** http://192.168.31.5:8686 - Music automation
+- **Transmission:** http://192.168.31.5:9091 - Torrent downloads
 
 **Content & Reading:**
-- **Nextcloud:** http://192.168.31.208:8080 - File storage and collaboration
-- **Audiobookshelf:** http://192.168.31.208:80 - Audiobook management
-- **Kavita:** http://192.168.31.208:5000 - Ebook/comic reading server
-- **Stacks:** http://192.168.31.208:7788 - Anna's Archive download manager (admin/admin123)
+- **Nextcloud:** http://192.168.31.6:8080 - File storage and collaboration
+- **Audiobookshelf:** http://192.168.31.6:80 - Audiobook management
+- **Kavita:** http://192.168.31.6:5000 - Ebook/comic reading server
+- **Stacks:** http://192.168.31.6:7788 - Anna's Archive download manager (admin/admin123)
 
 **Automation:**
-- **n8n:** http://192.168.31.208:5678 - Workflow automation
+- **n8n:** http://192.168.31.6:5678 - Workflow automation
 
 **Configure proxy hosts** in Nginx Proxy Manager:
   - jellyfin.homelab.local → jellyfin:8096

@@ -4,14 +4,14 @@ A sleek, modern dashboard that puts all of your homelab services in one place.
 
 ## Access
 
-- **URL:** http://192.168.31.75:7575
+- **URL:** http://192.168.31.5:7575
 - **Default credentials:** Set on first launch
 
 ## First Time Setup
 
 ```bash
 # 1. Create volume directories (on Helios)
-ssh eduardo@192.168.31.75
+ssh eduardo@192.168.31.5
 sudo mkdir -p /data/docker/homarr/data
 sudo chown -R 1000:1000 /data/docker/homarr
 
@@ -43,7 +43,7 @@ nano .env
 ```
 
 **Required variables:**
-- `HOMARR_URL` - Your Homarr instance URL (default: http://192.168.31.75:7575)
+- `HOMARR_URL` - Your Homarr instance URL (default: http://192.168.31.5:7575)
 - `HOMARR_API_KEY` - API key for automated setup (get from Profile → Settings → API Keys)
 
 **Security Note:** The `.env` file is excluded from git via `.gitignore` to protect your secrets.
@@ -119,43 +119,43 @@ The script will automatically create:
 - 18 apps with all your services pre-configured
 
 **Getting your API Key:**
-1. Open http://192.168.31.75:7575 in browser
+1. Open http://192.168.31.5:7575 in browser
 2. Click on your profile (top right)
 3. Go to Settings → API Keys
 4. Create a new API key
 5. Copy and paste into `.env` file
 
 **Option 2: Web UI Import**
-1. Access Homarr at http://192.168.31.75:7575
+1. Access Homarr at http://192.168.31.5:7575
 2. Go to Management → Boards
 3. Create a new board or edit existing
 4. Use the reference table below to add services manually
 
 **Option 3: Manual Configuration via Web UI**
-1. Access Homarr at http://192.168.31.75:7575
+1. Access Homarr at http://192.168.31.5:7575
 2. Click "Add element" → "App"
 3. Configure each service from the table below
 
 | Service | URL | Category | Integration |
 |---------|-----|----------|-------------|
-| Jellyfin | http://192.168.31.75:8096 | Media | - |
-| Sonarr | http://192.168.31.75:8989 | Automation | Sonarr |
-| Radarr | http://192.168.31.75:7878 | Automation | Radarr |
-| Lidarr | http://192.168.31.75:8686 | Automation | Lidarr |
-| Bazarr | http://192.168.31.75:6767 | Automation | - |
-| Prowlarr | http://192.168.31.75:9696 | Automation | - |
-| Jackett | http://192.168.31.75:9117 | Automation | - |
-| Jellyseerr | http://192.168.31.75:5055 | Requests | Overseerr |
-| Audiobookshelf | http://192.168.31.75:8080 | Media | - |
-| Kavita | http://192.168.31.75:5000 | Books | - |
-| Listenarr | http://192.168.31.75:8988 | Books | - |
-| LazyLibrarian | http://192.168.31.75:5299 | Books | - |
-| AudioBookRequest | http://192.168.31.75:8000 | Requests | - |
-| qBittorrent | http://192.168.31.75:9091 | Downloads | qBittorrent |
-| Nginx Proxy Manager | http://192.168.31.75:81 | Infrastructure | - |
-| Pi-hole | http://192.168.31.75:8053 | Infrastructure | Pi-hole |
-| n8n | http://192.168.31.75:5678 | Tools | - |
-| ebook2audiobook | http://192.168.31.75:7860 | Tools | - |
+| Jellyfin | http://192.168.31.5:8096 | Media | - |
+| Sonarr | http://192.168.31.5:8989 | Automation | Sonarr |
+| Radarr | http://192.168.31.5:7878 | Automation | Radarr |
+| Lidarr | http://192.168.31.5:8686 | Automation | Lidarr |
+| Bazarr | http://192.168.31.5:6767 | Automation | - |
+| Prowlarr | http://192.168.31.5:9696 | Automation | - |
+| Jackett | http://192.168.31.5:9117 | Automation | - |
+| Jellyseerr | http://192.168.31.5:5055 | Requests | Overseerr |
+| Audiobookshelf | http://192.168.31.5:8080 | Media | - |
+| Kavita | http://192.168.31.5:5000 | Books | - |
+| Listenarr | http://192.168.31.5:8988 | Books | - |
+| LazyLibrarian | http://192.168.31.5:5299 | Books | - |
+| AudioBookRequest | http://192.168.31.5:8000 | Requests | - |
+| qBittorrent | http://192.168.31.5:9091 | Downloads | qBittorrent |
+| Nginx Proxy Manager | http://192.168.31.5:81 | Infrastructure | - |
+| Pi-hole | http://192.168.31.5:8053 | Infrastructure | Pi-hole |
+| n8n | http://192.168.31.5:5678 | Tools | - |
+| ebook2audiobook | http://192.168.31.5:7860 | Tools | - |
 
 ### Setting Up Integrations
 
@@ -171,7 +171,7 @@ For services with integrations (Sonarr, Radarr, Lidarr, Jellyseerr, qBittorrent,
 
 ```bash
 # Backup dashboard configuration
-ssh eduardo@192.168.31.75
+ssh eduardo@192.168.31.5
 cp -r /data/docker/homarr/data/configs ~/homarr-backup-$(date +%Y%m%d)
 
 # Restore dashboard configuration

@@ -30,8 +30,8 @@ Domain: jellyfin.homelab.local    → IP: 192.168.31.237
 Domain: sonarr.homelab.local      → IP: 192.168.31.237
 Domain: radarr.homelab.local      → IP: 192.168.31.237
 Domain: transmission.homelab.local → IP: 192.168.31.237
-Domain: nextcloud.homelab.local   → IP: 192.168.31.208
-Domain: audiobooks.homelab.local  → IP: 192.168.31.208
+Domain: nextcloud.homelab.local   → IP: 192.168.31.6
+Domain: audiobooks.homelab.local  → IP: 192.168.31.6
 Domain: pihole.homelab.local      → IP: 192.168.31.237
 ```
 

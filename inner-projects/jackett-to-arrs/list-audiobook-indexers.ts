@@ -9,7 +9,7 @@ import puppeteer from "puppeteer";
 
 config();
 
-const JACKETT_URL = process.env.JACKETT_URL || "http://192.168.31.75:9117";
+const JACKETT_URL = process.env.JACKETT_URL || "http://192.168.31.5:9117";
 
 interface JackettIndexer {
   id: string;

@@ -85,16 +85,16 @@ docker service logs -f tts-webui-stack_tts-webui
 ### Web Interfaces
 
 **Gradio UI** (Recommended for first use):
-- **URL:** http://192.168.31.75:7770
+- **URL:** http://192.168.31.5:7770
 - **Via Traefik:** http://ttswebui.homelab.local
 
 **React UI** (Modern interface):
-- **URL:** http://192.168.31.75:3000
+- **URL:** http://192.168.31.5:3000
 - **Via Traefik:** http://ttswebui.homelab.local:3000
 
 ### First Time Setup
 
-1. **Open Gradio UI** at http://192.168.31.75:7770
+1. **Open Gradio UI** at http://192.168.31.5:7770
 2. **Install Chatterbox Extension** (if not pre-installed):
    - Go to Extensions tab
    - Find Chatterbox TTS extension
@@ -122,10 +122,10 @@ TTS WebUI also provides an OpenAI-compatible API:
 
 ```bash
 # Base URL for API
-http://192.168.31.75:7778/v1/audio/speech
+http://192.168.31.5:7778/v1/audio/speech
 
 # Example: Generate speech
-curl -X POST http://192.168.31.75:7778/v1/audio/speech \
+curl -X POST http://192.168.31.5:7778/v1/audio/speech \
   -H "Content-Type: application/json" \
   -d '{"input": "Olá, mundo!", "voice": "chatterbox"}' \
   --output speech.wav
@@ -242,14 +242,14 @@ tar czf tts-webui-voices-backup-$(date +%Y%m%d).tar.gz \
 
 1. Enable OpenAI API extension in TTS WebUI
 2. Configure Silly Tavern TTS endpoint:
-   - URL: `http://192.168.31.75:7778/v1/audio/speech`
+   - URL: `http://192.168.31.5:7778/v1/audio/speech`
 3. Select Chatterbox as voice model
 
 ### Open WebUI
 
 1. Enable OpenAI API extension
 2. Add TTS API in Open WebUI settings:
-   - Endpoint: `http://192.168.31.75:7778/v1/audio/speech`
+   - Endpoint: `http://192.168.31.5:7778/v1/audio/speech`
 
 ---
 

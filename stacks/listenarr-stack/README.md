@@ -22,7 +22,7 @@ docker stack deploy -c docker-compose.yml listenarr
 
 ## Access
 
-- **Web UI:** http://192.168.31.75:8988
+- **Web UI:** http://192.168.31.5:8988
 - **Port:** 8988 (internal: 5000)
 
 ## Configuration

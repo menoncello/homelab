@@ -79,7 +79,7 @@ sudo systemctl status smbd --no-pager -l | head -20
 echo ""
 echo "=== Samba is now running on host ==="
 echo "To test from macOS:"
-echo "  Finder → Cmd+K → smb://192.168.31.75"
+echo "  Finder → Cmd+K → smb://192.168.31.5"
 echo ""
 echo "To view logs:"
 echo "  sudo tail -f /var/log/samba/log.smbd"

@@ -25,7 +25,7 @@ Infraestrutura Docker Swarm com 2 nós focada em Media Center, Self-hosted servi
 - Radarr (filmes)
 - Transmission/qBittorrent (downloads)
 
-### Xeon01 (Worker Node) - 192.168.31.208
+### Xeon01 (Worker Node) - 192.168.31.6
 - **CPU:** Intel Xeon E5-2686
 - **RAM:** 96GB DDR4
 - **Storage:**
@@ -89,7 +89,7 @@ Internet (600/200 Fibra)
     ↓
 Roteador/Switch 2.5Gbps
     ├── Helios (192.168.31.237) - Manager
-    └── Xeon01 (192.168.31.208) - Worker
+    └── Xeon01 (192.168.31.6) - Worker
 ```
 
 ### Configuração

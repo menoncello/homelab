@@ -18,7 +18,7 @@ config();
 
 const CONFIG = {
   jackett: {
-    url: process.env.JACKETT_URL || "http://192.168.31.75:9117",
+    url: process.env.JACKETT_URL || "http://192.168.31.5:9117",
     apiKey: process.env.JACKETT_API_KEY || "",
   },
 };

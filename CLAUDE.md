@@ -280,7 +280,7 @@ TZ=America/Sao_Paulo
 
 ```bash
 # 1. Setup GPU runtime (pop-os only)
-ssh eduardo@192.168.31.75
+ssh eduardo@192.168.31.5
 ./scripts/setup-gpu.sh
 
 # 2. Create volume structure (both servers)
@@ -662,8 +662,8 @@ docker volume inspect <volume>
 ### Access URLs
 
 After deployment:
-- **Nginx Proxy Manager:** http://192.168.31.75:81
-- **Audiobookshelf:** http://192.168.31.75:8080
+- **Nginx Proxy Manager:** http://192.168.31.5:81
+- **Audiobookshelf:** http://192.168.31.5:8080
 - **Jellyfin:** http://jellyfin.homelab.local (after proxy config)
 - **Sonarr:** http://sonarr.homelab.local
 - **Radarr:** http://radarr.homelab.local
@@ -673,11 +673,11 @@ After deployment:
 
 ```bash
 # pop-os (Manager)
-ssh eduardo@192.168.31.75
+ssh eduardo@192.168.31.5
 docker context use homelab
 
 # Xeon01 (Worker)
-ssh eduardo@192.168.31.208
+ssh eduardo@192.168.31.6
 ```
 
 ---
