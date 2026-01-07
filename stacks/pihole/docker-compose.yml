@@ -29,9 +29,13 @@ services:
       - SERVERIP=192.168.31.5
       - VIRTUAL_HOST=pihole.homelab.local
       - WEBTHEME=default-darker
+      # Permitir queries de qualquer rede
+      - DNSMASQ_INTERFACE=
+      - FTLCONF_dns_listeningMode=all
     volumes:
       - pihole-config:/etc/pihole
       - pihole-dnsmasq:/etc/dnsmasq.d
+      - /data/docker/pihole/local-dns.conf:/etc/dnsmasq.d/02-homelab.conf:ro
     networks:
       - homelab-net
     ports:

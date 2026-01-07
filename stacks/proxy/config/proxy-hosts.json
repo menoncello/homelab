@@ -1,0 +1,92 @@
+{
+  "hosts": [
+    {
+      "domain": "jellyfin.homelab.local",
+      "name": "Jellyfin",
+      "target": "jellyfin",
+      "port": 8096,
+      "node": "pop-os",
+      "description": "Media server com GPU transcoding"
+    },
+    {
+      "domain": "sonarr.homelab.local",
+      "name": "Sonarr",
+      "target": "sonarr",
+      "port": 8989,
+      "node": "pop-os",
+      "description": "TV show automation"
+    },
+    {
+      "domain": "radarr.homelab.local",
+      "name": "Radarr",
+      "target": "radarr",
+      "port": 7878,
+      "node": "pop-os",
+      "description": "Movie automation"
+    },
+    {
+      "domain": "lidarr.homelab.local",
+      "name": "Lidarr",
+      "target": "lidarr",
+      "port": 8686,
+      "node": "pop-os",
+      "description": "Music automation"
+    },
+    {
+      "domain": "transmission.homelab.local",
+      "name": "Transmission",
+      "target": "transmission",
+      "port": 9091,
+      "node": "pop-os",
+      "description": "Torrent client"
+    },
+    {
+      "domain": "homarr.homelab.local",
+      "name": "Homarr",
+      "target": "homarr",
+      "port": 7575,
+      "node": "pop-os",
+      "description": "Dashboard"
+    },
+    {
+      "domain": "nextcloud.homelab.local",
+      "name": "Nextcloud",
+      "target": "192.168.31.6",
+      "port": 8080,
+      "node": "xeon01",
+      "description": "File storage (Xeon01)"
+    },
+    {
+      "domain": "audiobookshelf.homelab.local",
+      "name": "Audiobookshelf",
+      "target": "192.168.31.6",
+      "port": 80,
+      "node": "xeon01",
+      "description": "Audiobook server (Xeon01)"
+    },
+    {
+      "domain": "n8n.homelab.local",
+      "name": "n8n",
+      "target": "192.168.31.6",
+      "port": 5678,
+      "node": "xeon01",
+      "description": "Workflow automation (Xeon01)"
+    },
+    {
+      "domain": "kavita.homelab.local",
+      "name": "Kavita",
+      "target": "192.168.31.6",
+      "port": 5000,
+      "node": "xeon01",
+      "description": "Ebook/comic reader (Xeon01)"
+    },
+    {
+      "domain": "stacks.homelab.local",
+      "name": "Stacks",
+      "target": "192.168.31.6",
+      "port": 7788,
+      "node": "xeon01",
+      "description": "Anna's Archive downloader (Xeon01)"
+    }
+  ]
+}
