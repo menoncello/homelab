@@ -6,16 +6,16 @@ set -e
 
 # Configurações
 NGINX_PM_URL="http://192.168.31.5:81"
-NGINX_PM_USER="admin@example.com"
-NGINX_PM_PASS="changeme"  # Usuário deve mudar no primeiro acesso
-CERT_DIR="/data/docker/nginx-proxy/ssl"
-CERT_NAME="homelab-local"
+NGINX_PM_USER="eduardo.menoncello@gmail.com"
+NGINX_PM_PASS="4PFucpC3AdEwWC23E!PuenQuYDJRiCbREQWRN3G!"
+CERT_NAME="homelab"
+REMOTE_HOST="eduardo@192.168.31.5"
 
 # Cores
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║     Nginx Proxy Manager Setup                              ║"
@@ -26,27 +26,16 @@ echo ""
 echo "[1/6] Verificando Nginx Proxy Manager..."
 if ! curl -s "$NGINX_PM_URL" > /dev/null; then
     echo -e "${RED}✗ Nginx PM não está acessível em $NGINX_PM_URL${NC}"
-    echo "  Verifique se o container está rodando:"
-    echo "  docker service ls | grep proxy"
     exit 1
 fi
 echo -e "${GREEN}✓ Nginx PM acessível${NC}"
 
-# Gerar certificado SSL
+# Ler certificado do servidor remoto
 echo ""
-echo "[2/6] Gerando certificado SSL..."
-if [ ! -f "$CERT_DIR/$CERT_NAME.crt" ]; then
-    sudo mkdir -p "$CERT_DIR"
-    sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-      -keyout "$CERT_DIR/$CERT_NAME.key" \
-      -out "$CERT_DIR/$CERT_NAME.crt" \
-      -subj "/C=BR/ST=SP/L=SaoPaulo/O=Homelab/CN=homelab.local" \
-      -addext "subjectAltName=DNS:*.homelab.local,DNS:homelab.local"
-    sudo chown -R 1000:1000 "$CERT_DIR"
-    echo -e "${GREEN}✓ Certificado gerado${NC}"
-else
-    echo -e "${YELLOW}⚠ Certificado já existe, pulando...${NC}"
-fi
+echo "[2/6] Lendo certificado SSL..."
+CERT_CONTENT=$(ssh "$REMOTE_HOST" "cat /data/docker/nginx-proxy/ssl/homelab.crt" | awk 'NF {sub(/\r/, ""); printf "%s\\n",$0}')
+KEY_CONTENT=$(ssh "$REMOTE_HOST" "cat /data/docker/nginx-proxy/ssl/homelab.key" | awk 'NF {sub(/\r/, ""); printf "%s\\n",$0}')
+echo -e "${GREEN}✓ Certificado lido${NC}"
 
 # Fazer login e obter token
 echo ""
@@ -58,13 +47,6 @@ TOKEN=$(curl -s "$NGINX_PM_URL/api/tokens" \
 
 if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
     echo -e "${RED}✗ Falha na autenticação${NC}"
-    echo ""
-    echo "Possíveis causas:"
-    echo "  1. Credenciais incorretas (verifique NGINX_PM_USER e NGINX_PM_PASS)"
-    echo "  2. Primeiro acesso necessário - acesse http://192.168.31.5:81"
-    echo "     e faça login inicial para criar o usuário admin"
-    echo ""
-    echo "Após configurar, atualize as credenciais neste script e execute novamente."
     exit 1
 fi
 echo -e "${GREEN}✓ Autenticado${NC}"
@@ -73,15 +55,11 @@ echo -e "${GREEN}✓ Autenticado${NC}"
 echo ""
 echo "[4/6] Importando certificado para Nginx PM..."
 
-CERT_CONTENT=$(sudo cat "$CERT_DIR/$CERT_NAME.crt" | awk 'NF {sub(/\r/, ""); printf "%s\\n",$0}')
-KEY_CONTENT=$(sudo cat "$CERT_DIR/$CERT_NAME.key" | awk 'NF {sub(/\r/, ""); printf "%s\\n",$0}')
-
 CERT_ID=$(curl -s "$NGINX_PM_URL/api/nginx/custom-certificates" \
   -H "Authorization: Bearer $TOKEN" \
   | jq -r ".[] | select(.certificate.nice_name==\"$CERT_NAME\") | .id // empty")
 
 if [ -z "$CERT_ID" ]; then
-    # Criar novo certificado
     CERT_RESPONSE=$(curl -s "$NGINX_PM_URL/api/nginx/custom-certificates" \
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
@@ -135,8 +113,6 @@ jq -c '.hosts[]' "$HOSTS_JSON" | while read -r host; do
 
     if [ -n "$EXISTING" ]; then
         echo -e "  ${YELLOW}⚠ $NAME ($DOMAIN) já existe, atualizando...${NC}"
-
-        # Deletar host existente para recriar com certificado
         curl -s "$NGINX_PM_URL/api/nginx/proxy-hosts/$EXISTING" \
           -X DELETE \
           -H "Authorization: Bearer $TOKEN" > /dev/null
@@ -184,5 +160,5 @@ jq -r '.hosts[] | "  • https://\(.domain) → \(.name)"' "$HOSTS_JSON"
 echo ""
 echo -e "${YELLOW}⚠ Nota: O certificado é auto-assinado.${NC}"
 echo "  Seu navegador mostrará um aviso de segurança."
-echo "  Adicione uma exceção de segurança para continuar."
+echo "  Clique 'Avançado' → 'Aceitar o risco' para continuar."
 echo ""

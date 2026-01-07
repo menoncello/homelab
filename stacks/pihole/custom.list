@@ -1,0 +1,15 @@
+192.168.31.5 jellyfin.homelab.local
+192.168.31.5 sonarr.homelab.local
+192.168.31.5 radarr.homelab.local
+192.168.31.5 lidarr.homelab.local
+192.168.31.5 transmission.homelab.local
+192.168.31.5 homarr.homelab.local
+192.168.31.5 pihole.homelab.local
+192.168.31.5 proxy.homelab.local
+192.168.31.6 nextcloud.homelab.local
+192.168.31.6 audiobookshelf.homelab.local
+192.168.31.6 n8n.homelab.local
+192.168.31.6 kavita.homelab.local
+192.168.31.6 stacks.homelab.local
+192.168.31.5 helios.homelab.local
+192.168.31.6 xeon01.homelab.local
