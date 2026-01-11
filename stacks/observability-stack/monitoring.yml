@@ -1,0 +1,109 @@
+version: '3.8'
+
+secrets:
+  grafana_admin_password:
+    external: true
+
+services:
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:v1.107.0
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 1024M
+      labels:
+        - "prometheus.io.scrape=true"
+        - "prometheus.io.port=8428"
+    volumes:
+      - victoria-data:/victoria
+      - /home/eduardo/observability/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - '--storageDataPath=/victoria'
+      - '--promscrape.config=/etc/prometheus/prometheus.yml'
+      - '--retentionPeriod=30d'
+      - '--storage.minFreeDiskSpaceBytes=5GB'
+      - '--search.maxPointsPerTimeseries=30000'
+      - '--search.latencyOffset=30s'
+      - '--httpListenAddr=:8428'
+    environment:
+      - TZ=America/Sao_Paulo
+    networks:
+      - homelab-net
+    ports:
+      - target: 8428
+        published: 8428
+        mode: host
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.database == true
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "prometheus.io.scrape=true"
+        - "prometheus.io.port=3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
+      - GF_SERVER_ROOT_URL=https://grafana.homelab
+      - GF_INSTALL_PLUGINS=
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - TZ=America/Sao_Paulo
+    secrets:
+      - grafana_admin_password
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - /srv/docker/observability/config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - /srv/docker/observability/config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - /srv/docker/observability/config/grafana/dashboards/files:/var/lib/grafana/dashboards:ro
+    networks:
+      - homelab-net
+    ports:
+      - target: 3000
+        published: 3000
+        mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  homelab-net:
+    external: true
+
+volumes:
+  victoria-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/eduardo/observability/victoria
+  grafana-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/observability/grafana

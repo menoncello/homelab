@@ -1,0 +1,1629 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_VICTORIAMETRICS",
+      "label": "victoriametrics",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "gauge",
+      "name": "Gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.4.3"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph (old)",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Docker monitoring with Prometheus and cAdvisor",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "gnetId": 18509,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vm-ssdq"
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vm-ssdq"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Docker Swarm",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 7,
+        "x": 0,
+        "y": 1
+      },
+      "id": 7,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "count(container_last_seen{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"})",
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "metric": "container_last_seen",
+          "refId": "A",
+          "step": 240
+        }
+      ],
+      "title": "Running containers",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "In Percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "percentage",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 65
+                    },
+                    {
+                      "color": "dark-red",
+                      "value": 90
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "In Data"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Swarm Total"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "super-light-green",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 9,
+        "x": 7,
+        "y": 1
+      },
+      "id": 5,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "sum(container_memory_working_set_bytes{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"})",
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Usage",
+          "metric": "container_memory_rss",
+          "refId": "A",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "sum(container_memory_working_set_bytes{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}) / sum(machine_memory_bytes{job=\"$cluster\"}) * 100",
+          "hide": true,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "In Percent",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "sum(machine_memory_bytes{job=\"$cluster\"})",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Total",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 65
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 6,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "(sum(rate(container_cpu_user_seconds_total{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}[2m])) / sum (machine_cpu_cores{job=\"$cluster\"})) * 100",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "metric": "container_memory_rss",
+          "refId": "A",
+          "step": 240
+        }
+      ],
+      "title": "Swarm CPU Usage (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 65
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 31,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "sum(container_memory_working_set_bytes{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}) / sum(machine_memory_bytes{job=\"$cluster\"}) * 100",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "metric": "container_memory_rss",
+          "refId": "A",
+          "step": 240
+        }
+      ],
+      "title": "Swarm Memory Usage (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.65
+              },
+              {
+                "color": "dark-red",
+                "value": 0.85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU(%)"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mem. Usage(MiB)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mem. Limit(MiB)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Container"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 267
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mem(%)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "blue",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 0.65
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.8
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Service Name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 272
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Priority"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Instance"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": []
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 30,
+      "interval": "1s",
+      "options": {
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Priority"
+          }
+        ]
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "label_replace(rate(container_cpu_user_seconds_total{image!=\"\", image!~\".*cadvisor\", image!=\"\", job=\"$cluster\"}[2m]), \"node\", \"$1\", \"instance\", \"(.*):48080\")\r\n\r",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "container_memory_working_set_bytes{image!=\"\", image!~\".*cadvisor\", image!=\"\", job=\"$cluster\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "((container_spec_memory_limit_bytes{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"} == 0) + on (instance) group_left(image) (machine_memory_bytes{job=\"$cluster\"})) OR (container_spec_memory_limit_bytes{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"} > 0)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "time() - container_start_time_seconds{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "D"
+        }
+      ],
+      "title": "Container Resource Allocation and Usage",
+      "transformations": [
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "name"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Value #A": false,
+              "__name__": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "container_label_com_docker_desktop_extension_api_version 1": true,
+              "container_label_com_docker_desktop_extension_api_version 2": true,
+              "container_label_com_docker_desktop_extension_api_version 3": true,
+              "container_label_com_docker_desktop_extension_api_version 4": true,
+              "container_label_com_docker_desktop_extension_icon 1": true,
+              "container_label_com_docker_desktop_extension_icon 2": true,
+              "container_label_com_docker_desktop_extension_icon 3": true,
+              "container_label_com_docker_desktop_extension_icon 4": true,
+              "container_label_com_docker_extension_additional_urls 1": true,
+              "container_label_com_docker_extension_additional_urls 2": true,
+              "container_label_com_docker_extension_additional_urls 3": true,
+              "container_label_com_docker_extension_additional_urls 4": true,
+              "container_label_com_docker_extension_detailed_description 1": true,
+              "container_label_com_docker_extension_detailed_description 2": true,
+              "container_label_com_docker_extension_detailed_description 3": true,
+              "container_label_com_docker_extension_detailed_description 4": true,
+              "container_label_com_docker_extension_publisher_url 1": true,
+              "container_label_com_docker_extension_publisher_url 2": true,
+              "container_label_com_docker_extension_publisher_url 3": true,
+              "container_label_com_docker_extension_publisher_url 4": true,
+              "container_label_com_docker_extension_screenshots 1": true,
+              "container_label_com_docker_extension_screenshots 2": true,
+              "container_label_com_docker_extension_screenshots 3": true,
+              "container_label_com_docker_extension_screenshots 4": true,
+              "container_label_com_docker_stack_namespace 1": true,
+              "container_label_com_docker_stack_namespace 2": true,
+              "container_label_com_docker_stack_namespace 3": true,
+              "container_label_com_docker_stack_namespace 4": true,
+              "container_label_com_docker_swarm_node_id 1": true,
+              "container_label_com_docker_swarm_node_id 2": true,
+              "container_label_com_docker_swarm_node_id 3": true,
+              "container_label_com_docker_swarm_node_id 4": true,
+              "container_label_com_docker_swarm_service_id 1": true,
+              "container_label_com_docker_swarm_service_id 2": true,
+              "container_label_com_docker_swarm_service_id 3": true,
+              "container_label_com_docker_swarm_service_id 4": true,
+              "container_label_com_docker_swarm_service_name 1": false,
+              "container_label_com_docker_swarm_service_name 2": true,
+              "container_label_com_docker_swarm_service_name 3": true,
+              "container_label_com_docker_swarm_service_name 4": true,
+              "container_label_com_docker_swarm_task_id 1": true,
+              "container_label_com_docker_swarm_task_id 2": true,
+              "container_label_com_docker_swarm_task_id 3": true,
+              "container_label_com_docker_swarm_task_id 4": true,
+              "container_label_com_docker_swarm_task_name 1": true,
+              "container_label_com_docker_swarm_task_name 2": true,
+              "container_label_com_docker_swarm_task_name 3": true,
+              "container_label_com_docker_swarm_task_name 4": true,
+              "container_label_io_portainer_agent 1": true,
+              "container_label_io_portainer_agent 2": true,
+              "container_label_io_portainer_agent 3": true,
+              "container_label_io_portainer_agent 4": true,
+              "container_label_io_portainer_server 1": true,
+              "container_label_io_portainer_server 2": true,
+              "container_label_io_portainer_server 3": true,
+              "container_label_io_portainer_server 4": true,
+              "container_label_maintainer 1": true,
+              "container_label_maintainer 2": true,
+              "container_label_maintainer 3": true,
+              "container_label_maintainer 4": true,
+              "container_label_org_opencontainers_image_description 1": true,
+              "container_label_org_opencontainers_image_description 2": true,
+              "container_label_org_opencontainers_image_description 3": true,
+              "container_label_org_opencontainers_image_description 4": true,
+              "container_label_org_opencontainers_image_documentation 1": true,
+              "container_label_org_opencontainers_image_documentation 2": true,
+              "container_label_org_opencontainers_image_documentation 3": true,
+              "container_label_org_opencontainers_image_documentation 4": true,
+              "container_label_org_opencontainers_image_title 1": true,
+              "container_label_org_opencontainers_image_title 2": true,
+              "container_label_org_opencontainers_image_title 3": true,
+              "container_label_org_opencontainers_image_title 4": true,
+              "container_label_org_opencontainers_image_url 1": true,
+              "container_label_org_opencontainers_image_url 2": true,
+              "container_label_org_opencontainers_image_url 3": true,
+              "container_label_org_opencontainers_image_url 4": true,
+              "container_label_org_opencontainers_image_vendor 1": true,
+              "container_label_org_opencontainers_image_vendor 2": true,
+              "container_label_org_opencontainers_image_vendor 3": true,
+              "container_label_org_opencontainers_image_vendor 4": true,
+              "container_label_org_opencontainers_image_version 1": true,
+              "container_label_org_opencontainers_image_version 2": true,
+              "container_label_org_opencontainers_image_version 3": true,
+              "container_label_org_opencontainers_image_version 4": true,
+              "container_label_traefik_backend 1": true,
+              "container_label_traefik_backend 2": true,
+              "container_label_traefik_backend 3": true,
+              "container_label_traefik_backend 4": true,
+              "container_label_traefik_docker_network 1": true,
+              "container_label_traefik_docker_network 2": true,
+              "container_label_traefik_docker_network 3": true,
+              "container_label_traefik_docker_network 4": true,
+              "container_label_traefik_enable 1": true,
+              "container_label_traefik_enable 2": true,
+              "container_label_traefik_enable 3": true,
+              "container_label_traefik_enable 4": true,
+              "container_label_traefik_frontend_rule 1": true,
+              "container_label_traefik_frontend_rule 2": true,
+              "container_label_traefik_frontend_rule 3": true,
+              "container_label_traefik_frontend_rule 4": true,
+              "container_label_traefik_port 1": true,
+              "container_label_traefik_port 2": true,
+              "container_label_traefik_port 3": true,
+              "container_label_traefik_port 4": true,
+              "id 1": true,
+              "id 2": true,
+              "id 3": true,
+              "id 4": true,
+              "image 1": true,
+              "image 2": true,
+              "image 3": true,
+              "image 4": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "instance 4": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "job 4": true
+            },
+            "indexByName": {
+              "Time 1": 8,
+              "Time 2": 17,
+              "Time 3": 29,
+              "Time 4": 41,
+              "Value #A": 5,
+              "Value #B": 6,
+              "Value #C": 7,
+              "Value #D": 4,
+              "__name__ 1": 28,
+              "__name__ 2": 30,
+              "container_label_com_docker_stack_namespace 1": 9,
+              "container_label_com_docker_stack_namespace 2": 18,
+              "container_label_com_docker_stack_namespace 3": 31,
+              "container_label_com_docker_stack_namespace 4": 42,
+              "container_label_com_docker_swarm_node_id 1": 10,
+              "container_label_com_docker_swarm_node_id 2": 19,
+              "container_label_com_docker_swarm_node_id 3": 32,
+              "container_label_com_docker_swarm_node_id 4": 43,
+              "container_label_com_docker_swarm_service_id 1": 11,
+              "container_label_com_docker_swarm_service_id 2": 20,
+              "container_label_com_docker_swarm_service_id 3": 33,
+              "container_label_com_docker_swarm_service_id 4": 44,
+              "container_label_com_docker_swarm_service_name 1": 2,
+              "container_label_com_docker_swarm_service_name 2": 21,
+              "container_label_com_docker_swarm_service_name 3": 34,
+              "container_label_com_docker_swarm_service_name 4": 45,
+              "container_label_com_docker_swarm_task_id 1": 12,
+              "container_label_com_docker_swarm_task_id 2": 22,
+              "container_label_com_docker_swarm_task_id 3": 35,
+              "container_label_com_docker_swarm_task_id 4": 46,
+              "container_label_com_docker_swarm_task_name 1": 13,
+              "container_label_com_docker_swarm_task_name 2": 23,
+              "container_label_com_docker_swarm_task_name 3": 36,
+              "container_label_com_docker_swarm_task_name 4": 47,
+              "container_label_org_opencontainers_image_description 1": 52,
+              "container_label_org_opencontainers_image_description 2": 61,
+              "container_label_org_opencontainers_image_description 3": 70,
+              "container_label_org_opencontainers_image_description 4": 79,
+              "container_label_org_opencontainers_image_documentation 1": 53,
+              "container_label_org_opencontainers_image_documentation 2": 62,
+              "container_label_org_opencontainers_image_documentation 3": 71,
+              "container_label_org_opencontainers_image_documentation 4": 80,
+              "container_label_org_opencontainers_image_title 1": 54,
+              "container_label_org_opencontainers_image_title 2": 63,
+              "container_label_org_opencontainers_image_title 3": 72,
+              "container_label_org_opencontainers_image_title 4": 81,
+              "container_label_org_opencontainers_image_url 1": 55,
+              "container_label_org_opencontainers_image_url 2": 64,
+              "container_label_org_opencontainers_image_url 3": 73,
+              "container_label_org_opencontainers_image_url 4": 82,
+              "container_label_org_opencontainers_image_vendor 1": 56,
+              "container_label_org_opencontainers_image_vendor 2": 65,
+              "container_label_org_opencontainers_image_vendor 3": 74,
+              "container_label_org_opencontainers_image_vendor 4": 83,
+              "container_label_org_opencontainers_image_version 1": 57,
+              "container_label_org_opencontainers_image_version 2": 66,
+              "container_label_org_opencontainers_image_version 3": 75,
+              "container_label_org_opencontainers_image_version 4": 84,
+              "container_label_traefik_enable 1": 58,
+              "container_label_traefik_enable 2": 67,
+              "container_label_traefik_enable 3": 76,
+              "container_label_traefik_enable 4": 85,
+              "container_label_traefik_frontend_rule 1": 59,
+              "container_label_traefik_frontend_rule 2": 68,
+              "container_label_traefik_frontend_rule 3": 77,
+              "container_label_traefik_frontend_rule 4": 86,
+              "container_label_traefik_port 1": 60,
+              "container_label_traefik_port 2": 69,
+              "container_label_traefik_port 3": 78,
+              "container_label_traefik_port 4": 87,
+              "id 1": 14,
+              "id 2": 24,
+              "id 3": 37,
+              "id 4": 48,
+              "image 1": 15,
+              "image 2": 25,
+              "image 3": 38,
+              "image 4": 49,
+              "instance 1": 3,
+              "instance 2": 26,
+              "instance 3": 39,
+              "instance 4": 50,
+              "job 1": 16,
+              "job 2": 27,
+              "job 3": 40,
+              "job 4": 51,
+              "name": 0,
+              "node": 1
+            },
+            "renameByName": {
+              "Time 1": "",
+              "Value #A": "CPU(%)",
+              "Value #B": "Mem. Usage(MiB)",
+              "Value #C": "Mem. Limit(MiB)",
+              "Value #D": "Uptime",
+              "container_label_com_docker_swarm_service_name 1": "Service Name",
+              "instance 1": "Instance",
+              "name": "Container",
+              "node": "Node"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Mem(%)",
+            "binary": {
+              "left": "Mem. Usage(MiB)",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Mem. Limit(MiB)"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "Mem. Limit"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Priority",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "CPU(%)",
+                "Mem(%)"
+              ],
+              "reducer": "max"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vm-ssdq"
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 33,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vm-ssdq"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Details",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "decimals": 2,
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "isNew": true,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sort": "current",
+        "sortDesc": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.4.3",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "label_replace(rate(container_cpu_user_seconds_total{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}[2m]) * 100, \"node\", \"$1\", \"instance\", \"(.*):48080\")",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{node}} - {{name}}",
+          "metric": "cpu",
+          "refId": "A",
+          "step": 10
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "CPU Usage",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "percent",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "decimals": 2,
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "hiddenSeries": false,
+      "id": 1,
+      "isNew": true,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sort": "current",
+        "sortDesc": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.4.3",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "label_replace(container_memory_working_set_bytes{image!=\"\", image!~\".*cadvisor\", image!=\"\", job=\"$cluster\"}, \"node\", \"$1\", \"instance\", \"(.*):48080\")",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "{{node}} - {{name}}",
+          "metric": "container_memory_rss",
+          "refId": "A",
+          "step": 10
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Memory Usage",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "label": "",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "hiddenSeries": false,
+      "id": 3,
+      "isNew": true,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.4.3",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "irate(container_network_receive_bytes_total{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}[5m])",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "{{name}}",
+          "metric": "container_network_receive_bytes_total",
+          "refId": "A",
+          "step": 20
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Network Rx",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "Bps",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "isNew": true,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.4.3",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_VICTORIAMETRICS}"
+          },
+          "exemplar": true,
+          "expr": "irate(container_network_transmit_bytes_total{image!=\"\", image!~\".*cadvisor\", job=\"$cluster\"}[5m])",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "{{name}}",
+          "refId": "A",
+          "step": 20
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Network Tx",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "Bps",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    }
+  ],
+  "refresh": "",
+  "revision": 1,
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "docker"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "victoriametrics",
+          "value": "victoriametrics"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
+        "definition": "label_values(machine_memory_bytes{job=~\"altopay-.*\"}, job)  ",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "query": "label_values(machine_memory_bytes{job=~\"altopay-.*\"}, job)  ",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Docker Swarm Monitoring",
+  "uid": "txZxTuZVz",
+  "version": 5,
+  "weekStart": ""
+}

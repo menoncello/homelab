@@ -1,0 +1,124 @@
+# Media Stack
+# Combined media services: Jellyfin, Audiobookshelf, Calibre-Web, Book Searcher
+# Deploy via Portainer or: docker stack deploy -c docker-compose.yml media
+
+version: '3.8'
+
+services:
+  # Jellyfin - Media server with GPU acceleration
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    hostname: jellyfin
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.menoncello.com
+      - TZ=America/Sao_Paulo
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility,graphics
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - /media/movies:/media/movies
+      - /media/series:/media/series
+      - /media/incomplete:/media/incomplete
+    networks:
+      - homelab-net
+    ports:
+      - target: 8096
+        published: 8096
+        protocol: tcp
+        mode: host
+
+  # Audiobookshelf - Audiobook and podcast server
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    hostname: audiobookshelf
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: any
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /data/docker/audiobookshelf/config:/config
+      - /data/docker/audiobookshelf/metadata:/metadata
+      - /data/media/audiobooks:/audiobooks
+      - /data/media/podcasts:/podcasts
+    networks:
+      - homelab-net
+    ports:
+      - target: 80
+        published: 13378
+        protocol: tcp
+        mode: host
+
+  # Calibre-Web Automated - Ebook manager with automatic download/conversion
+  calibre:
+    image: crocodilestick/calibre-web-automated:latest
+    hostname: calibre
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 1G
+      restart_policy:
+        condition: any
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - type: bind
+        source: /srv/docker/calibre/config
+        target: /config
+      - type: bind
+        source: /srv/docker/books
+        target: /books
+      - type: bind
+        source: /srv/docker/calibre-ingest
+        target: /cwa-book-ingest
+    networks:
+      - homelab-net
+    ports:
+      - target: 8083
+        published: 8083
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  jellyfin-config:
+    external: true
+    name: jellyfin-config
+  jellyfin-cache:
+    driver: local
+    name: jellyfin-cache
