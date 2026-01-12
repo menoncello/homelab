@@ -65,7 +65,7 @@ sudo chown -R 1000:1000 /media/audiobooks/
 cd stacks/tts-webui-stack
 
 # Deploy stack
-docker stack deploy -c docker-compose.yml tts-webui-stack
+docker stack deploy -c media.docker-compose.yml tts-webui-stack
 ```
 
 ### Verify Deployment
@@ -86,11 +86,11 @@ docker service logs -f tts-webui-stack_tts-webui
 
 **Gradio UI** (Recommended for first use):
 - **URL:** http://192.168.31.5:7770
-- **Via Traefik:** http://ttswebui.homelab.local
+- **Via Traefik:** http://ttswebui.homelab
 
 **React UI** (Modern interface):
 - **URL:** http://192.168.31.5:3000
-- **Via Traefik:** http://ttswebui.homelab.local:3000
+- **Via Traefik:** http://ttswebui.homelab:3000
 
 ### First Time Setup
 
@@ -184,7 +184,7 @@ resources:
 
 Then redeploy:
 ```bash
-docker stack deploy -c docker-compose.yml tts-webui-stack
+docker stack deploy -c media.docker-compose.yml tts-webui-stack
 ```
 
 ### Models Not Loading
@@ -217,7 +217,7 @@ docker pull ghcr.io/rsxdalv/tts-webui:main
 
 # Redeploy
 cd stacks/tts-webui-stack
-docker stack deploy -c docker-compose.yml tts-webui-stack
+docker stack deploy -c media.docker-compose.yml tts-webui-stack
 ```
 
 ### Clean Model Cache

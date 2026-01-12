@@ -1,0 +1,124 @@
+# OnlyOffice Stack
+# Document server with PostgreSQL
+# Deploy with: docker stack deploy -c stacks/productivity/media.docker-compose.yml productivity
+
+version: '3.8'
+
+services:
+  onlyoffice-documentserver:
+    image: onlyoffice/documentserver:latest
+    hostname: onlyoffice
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+      restart_policy:
+        condition: any
+    environment:
+      - TZ=America/Sao_Paulo
+      - DB_TYPE=postgres
+      - DB_HOST=onlyoffice-db
+      - DB_PORT=5432
+      - DB_NAME=onlyoffice
+      - DB_USER=onlyoffice
+      - DB_PWD_FILE=/run/secrets/db_password
+      - REDIS_SERVER_HOST=onlyoffice-redis
+      - REDIS_SERVER_PORT=6379
+    volumes:
+      - onlyoffice-data:/var/www/onlyoffice/Data
+      - onlyoffice-logs:/var/log/onlyoffice
+      - onlyoffice-fonts:/usr/share/fonts/truetype
+    networks:
+      - homelab-net
+    ports:
+      - target: 80
+        published: 9090
+        protocol: tcp
+        mode: host
+    secrets:
+      - db_password
+
+  onlyoffice-db:
+    image: postgres:15-alpine
+    hostname: onlyoffice-db
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.database == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - POSTGRES_DB=onlyoffice
+      - POSTGRES_USER=onlyoffice
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - onlyoffice-db-data:/var/lib/postgresql/data
+    networks:
+      - homelab-net
+    secrets:
+      - db_password
+
+  onlyoffice-redis:
+    image: redis:7-alpine
+    hostname: onlyoffice-redis
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    volumes:
+      - onlyoffice-redis-data:/data
+    networks:
+      - homelab-net
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+secrets:
+  db_password:
+    file: ./secrets/onlyoffice_db_password.txt
+
+volumes:
+  onlyoffice-data:
+    driver: local
+    name: onlyoffice-data
+
+  onlyoffice-logs:
+    driver: local
+    name: onlyoffice-logs
+
+  onlyoffice-fonts:
+    driver: local
+    name: onlyoffice-fonts
+
+  onlyoffice-db-data:
+    driver: local
+    name: onlyoffice-db-data
+
+  onlyoffice-redis-data:
+    driver: local
+    name: onlyoffice-redis-data

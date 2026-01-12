@@ -18,7 +18,7 @@ Self-hosted audiobook and podcast server with a clean, modern interface.
 
 ```bash
 cd stacks/audiobookshelf-stack
-docker stack deploy -c docker-compose.yml audiobookshelf
+docker stack deploy -c media.docker-compose.yml audiobookshelf
 ```
 
 ## Access

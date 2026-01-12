@@ -1,6 +1,6 @@
 # Audiobookshelf Stack
 # Self-hosted audiobook and podcast server
-# Deploy with: docker stack deploy -c stacks/audiobookshelf-stack/docker-compose.yml audiobookshelf
+# Deploy with: docker stack deploy -c stacks/audiobookshelf-stack/media.docker-compose.yml audiobookshelf
 #
 # Features:
 # - Clean interface for browsing and playing audiobooks
@@ -9,7 +9,7 @@
 # - Automatic metadata fetching
 # - Podcast support
 # - Mobile app support (Booksonic app)
-:K
+
 version: '3.8'
 
 services:
@@ -33,13 +33,13 @@ services:
     volumes:
       - /data/docker/audiobookshelf/config:/config
       - /data/docker/audiobookshelf/metadata:/metadata
-      - /media/audiobooks:/audiobooks
-      - /media/podcasts:/podcasts
+      - /data/media/audiobooks:/audiobooks
+      - /data/media/podcasts:/podcasts
     networks:
       - homelab-net
     ports:
       - target: 80
-        published: 8080
+        published: 13378
         protocol: tcp
         mode: host
 

@@ -1,12 +1,12 @@
 #!/bin/bash
-# Gerar certificado SSL auto-assinado para homelab.local
+# Gerar certificado SSL auto-assinado para homelab
 # Execute no servidor Helios
 
 set -e
 
 CERT_DIR="/data/docker/nginx-proxy/ssl"
 CERT_NAME="homelab-local"
-DOMAIN="*.homelab.local"
+DOMAIN="*.homelab"
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║     Gerando Certificado SSL Auto-assinado                  ║"
@@ -23,8 +23,8 @@ echo "[2/4] Gerando certificado SSL wildcard..."
 sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
   -keyout "$CERT_DIR/$CERT_NAME.key" \
   -out "$CERT_DIR/$CERT_NAME.crt" \
-  -subj "/C=BR/ST=SP/L=SaoPaulo/O=Homelab/CN=homelab.local" \
-  -addext "subjectAltName=DNS:$DOMAIN,DNS:homelab.local"
+  -subj "/C=BR/ST=SP/L=SaoPaulo/O=Homelab/CN=homelab" \
+  -addext "subjectAltName=DNS:$DOMAIN,DNS:homelab"
 
 echo "  ✓ Certificado gerado"
 
@@ -49,6 +49,6 @@ echo "Arquivos criados:"
 echo "  - $CERT_DIR/$CERT_NAME.crt"
 echo "  - $CERT_DIR/$CERT_NAME.key"
 echo ""
-echo "Válido para: *.homelab.local"
+echo "Válido para: *.homelab"
 echo "Validade: 10 anos"
 echo ""

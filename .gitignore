@@ -16,7 +16,9 @@ Thumbs.db
 docker-compose.override.yml
 
 # Secrets
-secrets/
+secrets/*
+!secrets/*.example
+!**/secrets/*.example
 *.key
 *.pem
 *.crt
@@ -79,4 +81,4 @@ ansible/group_vars/all/vault.yml
 .\#*
 
 
-gmail.json
+gmail.json!stacks/observability-stack/secrets/*.example

@@ -58,7 +58,7 @@ docker info | grep "Swarm"
 ```bash
 # From stack directory
 cd stacks/infrastructure
-docker stack deploy -c docker-compose.yml infrastructure
+docker stack deploy -c media.docker-compose.yml infrastructure
 
 # Remove stack
 docker stack rm infrastructure
@@ -303,7 +303,7 @@ git pull
 
 # 2. Update specific stack
 cd stacks/gpu-services
-docker stack deploy -c docker-compose.yml gpu-services
+docker stack deploy -c media.docker-compose.yml gpu-services
 
 # 3. Monitor deployment
 docker service ps gpu-services_jellyfin
@@ -572,7 +572,7 @@ docker run --rm -it \
 **3. Deploy changes:**
 ```bash
 cd stacks/<stack-name>
-docker stack deploy -c docker-compose.yml <stack-name>
+docker stack deploy -c media.docker-compose.yml <stack-name>
 ```
 
 **4. Verify:**
@@ -637,7 +637,7 @@ docker context ls
 # Stack operations
 docker stack ls
 docker stack services <stack>
-docker stack deploy -c docker-compose.yml <stack>
+docker stack deploy -c media.docker-compose.yml <stack>
 docker stack rm <stack>
 
 # Service operations
@@ -664,10 +664,10 @@ docker volume inspect <volume>
 After deployment:
 - **Nginx Proxy Manager:** http://192.168.31.5:81
 - **Audiobookshelf:** http://192.168.31.5:8080
-- **Jellyfin:** http://jellyfin.homelab.local (after proxy config)
-- **Sonarr:** http://sonarr.homelab.local
-- **Radarr:** http://radarr.homelab.local
-- **Nextcloud:** http://nextcloud.homelab.local
+- **Jellyfin:** http://jellyfin.homelab (after proxy config)
+- **Sonarr:** http://sonarr.homelab
+- **Radarr:** http://radarr.homelab
+- **Nextcloud:** http://nextcloud.homelab
 
 ### Server Access
 

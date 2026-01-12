@@ -1,0 +1,5 @@
+# Content Servers Stack
+# Jellyfin, Nextcloud, Audiobookshelf, Calibre
+version: '3.8'
+
+# Include all content server services

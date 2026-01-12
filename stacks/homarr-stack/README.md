@@ -17,7 +17,7 @@ sudo chown -R 1000:1000 /data/docker/homarr
 
 # 2. Deploy stack (from manager)
 cd ~/homelab/stacks/homarr-stack
-docker stack deploy -c docker-compose.yml homarr
+docker stack deploy -c media.docker-compose.yml homarr
 
 # 3. Verify deployment
 docker service ls | grep homarr
@@ -98,25 +98,28 @@ A pre-configured dashboard is available in `configs/default-dashboard.json` with
 
 ### Importing Dashboard
 
-**Option 1: Automated Setup via API (Recommended - Fastest)**
+**Option 1: Automated Setup via Python Script (Recommended - Fastest) ⚡**
 
 This option automatically creates all apps, categories, and widgets using the Homarr API.
 
 ```bash
-cd ~/homelab/stacks/homarr-stack
+cd ~/repos/setup/homelab/stacks/homarr-stack
 
 # 1. Copy and configure .env file
 cp .env.example .env
 nano .env  # Add your HOMARR_API_KEY
 
-# 2. Make scripts executable and run
-chmod +x setup-dashboard.sh
-./setup-dashboard.sh
+# 2. Run the automation script (auto-creates venv)
+chmod +x setup-dashboard.py
+./setup-dashboard.py
 ```
 
+**Full guide:** See [AUTOMATED_SETUP.md](./AUTOMATED_SETUP.md)
+
 The script will automatically create:
-- 7 categories (Media, Automation, Requests, Infrastructure, Downloads, Books, Tools)
-- 18 apps with all your services pre-configured
+- **7 categories** (Media, Automation, Requests, Infrastructure, Downloads, Books, Tools)
+- **19 apps** with all your services pre-configured
+- **5 widgets** (System Resources, Weather, RSS, Date, Health)
 
 **Getting your API Key:**
 1. Open http://192.168.31.5:7575 in browser
@@ -138,24 +141,25 @@ The script will automatically create:
 
 | Service | URL | Category | Integration |
 |---------|-----|----------|-------------|
-| Jellyfin | http://192.168.31.5:8096 | Media | - |
-| Sonarr | http://192.168.31.5:8989 | Automation | Sonarr |
-| Radarr | http://192.168.31.5:7878 | Automation | Radarr |
-| Lidarr | http://192.168.31.5:8686 | Automation | Lidarr |
-| Bazarr | http://192.168.31.5:6767 | Automation | - |
-| Prowlarr | http://192.168.31.5:9696 | Automation | - |
-| Jackett | http://192.168.31.5:9117 | Automation | - |
-| Jellyseerr | http://192.168.31.5:5055 | Requests | Overseerr |
-| Audiobookshelf | http://192.168.31.5:8080 | Media | - |
-| Kavita | http://192.168.31.5:5000 | Books | - |
-| Listenarr | http://192.168.31.5:8988 | Books | - |
-| LazyLibrarian | http://192.168.31.5:5299 | Books | - |
-| AudioBookRequest | http://192.168.31.5:8000 | Requests | - |
-| qBittorrent | http://192.168.31.5:9091 | Downloads | qBittorrent |
+| Jellyfin | http://jellyfin:8096 | Media | Jellyfin |
+| Sonarr | http://sonarr:8989 | Automation | Sonarr |
+| Radarr | http://radarr:7878 | Automation | Radarr |
+| Lidarr | http://lidarr:8686 | Automation | Lidarr |
+| Bazarr | http://bazarr:6767 | Automation | - |
+| Prowlarr | http://prowlarr:9696 | Automation | - |
+| Jackett | http://jackett:9117 | Automation | - |
+| Jellyseerr | http://jellyseerr:5055 | Requests | Overseerr |
+| Audiobookshelf | http://audiobookshelf:80 | Media | - |
+| Kavita | http://kavita:5000 | Books | - |
+| Listenarr | http://listenarr:8988 | Books | - |
+| Stacks | http://stacks:7788 | Books | - |
+| qBittorrent | http://transmission:9091 | Downloads | qBittorrent |
 | Nginx Proxy Manager | http://192.168.31.5:81 | Infrastructure | - |
-| Pi-hole | http://192.168.31.5:8053 | Infrastructure | Pi-hole |
-| n8n | http://192.168.31.5:5678 | Tools | - |
-| ebook2audiobook | http://192.168.31.5:7860 | Tools | - |
+| Pi-hole | http://pihole:8053 | Infrastructure | Pi-hole |
+| n8n | http://n8n:5678 | Tools | - |
+| eBook2Audiobook | http://ebook2audiobook:7860 | Tools | - |
+| TTS WebUI | http://ttswebui:7770 | Tools | - |
+| Chatterbox | http://chatterbox:5123 | Tools | - |
 
 ### Setting Up Integrations
 

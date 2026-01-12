@@ -7,7 +7,7 @@ Configuração completa de DNS local (Pi-hole) e Reverse Proxy (Nginx Proxy Mana
 ```
 Dispositivo → DNS (Pi-hole) → Proxy (Nginx PM) → Serviço
      │              │                  │              │
-  homelab.local   192.168.31.5      :80/:443      :porta
+  homelab        192.168.31.5      :80/:443      :porta
 ```
 
 ## Estrutura de Arquivos
@@ -44,14 +44,14 @@ No seu computador local:
 
 ```bash
 cd ~/repos/setup/homelab/stacks/pihole
-docker -H ssh://eduardo@192.168.31.5 stack deploy -c docker-compose.yml pihole
+docker -H ssh://eduardo@192.168.31.5 stack deploy -c media.docker-compose.yml pihole
 ```
 
 Testar DNS:
 
 ```bash
-dig @192.168.31.5 jellyfin.homelab.local
-dig @192.168.31.5 sonarr.homelab.local
+dig @192.168.31.5 jellyfin.homelab
+dig @192.168.31.5 sonarr.homelab
 ```
 
 ### 2. Setup do Nginx Proxy Manager
@@ -90,10 +90,10 @@ Após configuração, acesse os serviços sem portas:
 
 | Serviço | URL Antes | URL Depois |
 |---------|-----------|------------|
-| Jellyfin | `http://192.168.31.5:8096` | `https://jellyfin.homelab.local` |
-| Sonarr | `http://192.168.31.5:8989` | `https://sonarr.homelab.local` |
-| Radarr | `http://192.168.31.5:7878` | `https://radarr.homelab.local` |
-| Nextcloud | `http://192.168.31.6:8080` | `https://nextcloud.homelab.local` |
+| Jellyfin | `http://192.168.31.5:8096` | `https://jellyfin.homelab` |
+| Sonarr | `http://192.168.31.5:8989` | `https://sonarr.homelab` |
+| Radarr | `http://192.168.31.5:7878` | `https://radarr.homelab` |
+| Nextcloud | `http://192.168.31.6:8080` | `https://nextcloud.homelab` |
 
 ## Adicionando Novos Serviços
 
@@ -102,13 +102,13 @@ Após configuração, acesse os serviços sem portas:
 Edite `stacks/pihole/local-dns.conf`:
 
 ```conf
-address=/novo-servico.homelab.local/192.168.31.5
+address=/novo-servico.homelab/192.168.31.5
 ```
 
 Redeploy o Pi-hole:
 
 ```bash
-docker -H ssh://eduardo@192.168.31.5 stack deploy -c stacks/pihole/docker-compose.yml pihole
+docker -H ssh://eduardo@192.168.31.5 stack deploy -c stacks/pihole/media.docker-compose.yml pihole
 ```
 
 ### 2. Adicionar ao Proxy
@@ -117,7 +117,7 @@ Edite `stacks/proxy/config/proxy-hosts.json`:
 
 ```json
 {
-  "domain": "novo-servico.homelab.local",
+  "domain": "novo-servico.homelab",
   "name": "Novo Serviço",
   "target": "novo-servico",
   "port": 8888,
@@ -144,7 +144,7 @@ docker -H ssh://eduardo@192.168.31.5 service ls | grep pihole
 ssh eduardo@192.168.31.5 "docker logs -f pihole_pihole"
 
 # Testar resolução direta
-dig @192.168.31.5 jellyfin.homelab.local
+dig @192.168.31.5 jellyfin.homelab
 ```
 
 ### Proxy não funciona
@@ -166,7 +166,7 @@ O certificado é auto-assinado. Seu navegador mostrará aviso de segurança.
 
 **Para aceitar o certificado:**
 
-1. Acesse https://<serviço>.homelab.local
+1. Acesse https://<serviço>.homelab
 2. Clique "Avançado" → "Aceitar o risco" ou "Adicionar exceção"
 3. O navegador vai lembrar para próximos acessos
 

@@ -1,0 +1,49 @@
+# Audiobookshelf Stack
+# Self-hosted audiobook and podcast server
+# Deploy with: docker stack deploy -c stacks/audiobookshelf-stack/media.docker-compose.yml audiobookshelf
+#
+# Features:
+# - Clean interface for browsing and playing audiobooks
+# - Multi-user support with permissions
+# - Progress tracking and bookmarks
+# - Automatic metadata fetching
+# - Podcast support
+# - Mobile app support (Booksonic app)
+
+version: '3.8'
+
+services:
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    hostname: audiobookshelf
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == pop-os
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: any
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /data/docker/audiobookshelf/config:/config
+      - /data/docker/audiobookshelf/metadata:/metadata
+      - /data/media/audiobooks:/audiobooks
+      - /data/media/podcasts:/podcasts
+    networks:
+      - homelab-net
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net

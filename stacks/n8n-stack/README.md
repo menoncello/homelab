@@ -50,7 +50,7 @@ sudo chown -R 1000:1000 /srv/docker/n8n
 
 ```bash
 cd ~/homelab/stacks/n8n-stack
-docker stack deploy -c docker-compose.yml n8n
+docker stack deploy -c media.docker-compose.yml n8n
 
 # Verify
 docker service ls | grep n8n

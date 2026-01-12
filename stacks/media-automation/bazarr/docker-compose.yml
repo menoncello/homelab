@@ -1,0 +1,43 @@
+# Bazarr Stack
+# Subtitle download management
+# Deploy with: docker stack deploy -c stacks/media-automation/bazarr/media.docker-compose.yml bazarr
+
+version: '3.8'
+
+services:
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    hostname: bazarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /data/docker/bazarr:/config
+      - /data/media/series:/media/series
+      - /data/media/movies:/media/movies
+    networks:
+      - homelab-net
+    ports:
+      - target: 6767
+        published: 6767
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net

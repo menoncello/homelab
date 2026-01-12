@@ -6,7 +6,7 @@
 SOURCE_DIR="/Users/menoncello/Music/Libation/Books"
 REMOTE_USER="eduardo"
 REMOTE_HOST="192.168.31.5"
-REMOTE_DIR="/media/audiobooks"
+REMOTE_DIR="/data/media/audiobooks"
 
 echo "📚 Sincronizando audiobooks..."
 echo "Origem: $SOURCE_DIR"

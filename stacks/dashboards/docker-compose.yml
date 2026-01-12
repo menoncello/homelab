@@ -1,0 +1,5 @@
+# Dashboards Stack
+# Homarr
+version: '3.8'
+
+# Include dashboard services

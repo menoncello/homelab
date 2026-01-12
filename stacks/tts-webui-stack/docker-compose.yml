@@ -23,7 +23,7 @@ services:
         max_attempts: 3
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.ttswebui.rule=Host(`ttswebui.homelab.local`)"
+        - "traefik.http.routers.ttswebui.rule=Host(`ttswebui.homelab`)"
         - "traefik.http.routers.ttswebui.entrypoints=web"
         - "traefik.http.services.ttswebui.loadbalancer.server.port=7770"
     environment:

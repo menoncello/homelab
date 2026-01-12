@@ -1,6 +1,6 @@
 # Calibre-Web Stack
 # All-in-one ebook manager with Anna's Archive integration
-# Deploy with: docker stack deploy -c stacks/calibre-stack/docker-compose.yml calibre
+# Deploy with: docker stack deploy -c stacks/calibre-stack/media.docker-compose.yml calibre
 
 version: '3.8'
 
@@ -28,16 +28,16 @@ services:
       - CALIBRE_CONFIG_DIRECTORY=/config/.config/calibre
     volumes:
       - type: bind
-        source: /data/docker/calibre/config
+        source: /srv/docker/calibre/config
         target: /config
       - type: bind
-        source: /media/books
+        source: /srv/docker/books
         target: /books
       - type: bind
-        source: /media/downloads/books
+        source: /srv/docker/calibre-ingest
         target: /cwa-book-ingest
       - type: bind
-        source: /media/books
+        source: /srv/docker/books
         target: /calibre-library
       - type: bind
         source: /data/docker/calibre/config/gmail.json
@@ -74,10 +74,10 @@ services:
       - DOWNLOAD_TIMEOUT=300
     volumes:
       - type: bind
-        source: /data/docker/book-searcher/config
+        source: /srv/docker/book-searcher/config
         target: /config
       - type: bind
-        source: /media/downloads/books
+        source: /srv/docker/calibre-ingest
         target: /downloads
     networks:
       - homelab-net
@@ -117,7 +117,7 @@ services:
       - TZ=America/Sao_Paulo
     volumes:
       - type: bind
-        source: /media/books
+        source: /srv/docker/books
         target: /calibre-library
       - type: bind
         source: /Users/menoncello/repos/setup/homelab/stacks/calibre-stack/converter.py

@@ -1,6 +1,6 @@
 # Database Stack
 # PostgreSQL and Redis for all homelab services
-# Deploy with: docker stack deploy -c stacks/database-stack/docker-compose.yml database
+# Deploy with: docker stack deploy -c stacks/database-stack/media.docker-compose.yml database
 
 version: '3.8'
 

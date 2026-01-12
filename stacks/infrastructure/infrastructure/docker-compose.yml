@@ -1,0 +1,130 @@
+# Infrastructure Stack
+# Defines base volumes and network configuration for Homelab
+# Deploy with: docker stack deploy -c stacks/infrastructure/media.docker-compose.yml infrastructure
+
+version: '3.8'
+
+# This stack primarily defines volumes for use by other stacks
+# No actual services run, but volumes are created globally
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  # Helios volumes (configs on /data - 337.8GB NVMe)
+  jellyfin-config:
+    name: jellyfin-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/jellyfin
+
+  sonarr-config:
+    name: sonarr-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/sonarr
+
+  radarr-config:
+    name: radarr-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/radarr
+
+  transmission-config:
+    name: transmission-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/transmission
+
+  nginx-proxy-data:
+    name: nginx-proxy-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/nginx-proxy
+
+  # Xeon01 volumes (configs on /srv - 434.1GB NVMe)
+  nextcloud-data:
+    name: nextcloud-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/nextcloud
+
+  audiobookshelf-config:
+    name: audiobookshelf-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/audiobookshelf/config
+
+  postgresql-data:
+    name: postgresql-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/docker/postgresql/data
+
+  # Xeon01 large data (on /home - 793.8GB)
+  audiobooks-data:
+    name: audiobooks-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/docker-data/audiobooks
+
+  nextcloud-userdata:
+    name: nextcloud-userdata
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/docker-data/nextcloud
+
+  # Media volumes (on Helios /media - 955.6GB NVMe)
+  movies-data:
+    name: movies-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/movies
+
+  series-data:
+    name: series-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/series
+
+  anime-data:
+    name: anime-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/anime
+
+  downloads-data:
+    name: downloads-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/incomplete

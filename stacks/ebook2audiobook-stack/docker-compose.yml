@@ -23,7 +23,7 @@ services:
         max_attempts: 3
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.ebook2audiobook.rule=Host(`ebook2audiobook.homelab.local`)"
+        - "traefik.http.routers.ebook2audiobook.rule=Host(`ebook2audiobook.homelab`)"
         - "traefik.http.routers.ebook2audiobook.entrypoints=web"
         - "traefik.http.services.ebook2audiobook.loadbalancer.server.port=7860"
     environment:

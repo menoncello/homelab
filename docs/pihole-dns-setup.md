@@ -17,7 +17,7 @@ Senha: piholeadmin2024
 
 ## Configuração Passo a Passo
 
-### 1. Configurar DNS Local para *.homelab.local
+### 1. Configurar DNS Local para *.homelab
 
 No Pi-hole Web UI:
 
@@ -26,13 +26,13 @@ No Pi-hole Web UI:
 3. **Adicione os registros:**
 
 ```
-Domain: jellyfin.homelab.local    → IP: 192.168.31.237
-Domain: sonarr.homelab.local      → IP: 192.168.31.237
-Domain: radarr.homelab.local      → IP: 192.168.31.237
-Domain: transmission.homelab.local → IP: 192.168.31.237
-Domain: nextcloud.homelab.local   → IP: 192.168.31.6
-Domain: audiobooks.homelab.local  → IP: 192.168.31.6
-Domain: pihole.homelab.local      → IP: 192.168.31.237
+Domain: jellyfin.homelab    → IP: 192.168.31.237
+Domain: sonarr.homelab      → IP: 192.168.31.237
+Domain: radarr.homelab      → IP: 192.168.31.237
+Domain: transmission.homelab → IP: 192.168.31.237
+Domain: nextcloud.homelab   → IP: 192.168.31.6
+Domain: audiobooks.homelab  → IP: 192.168.31.6
+Domain: pihole.homelab      → IP: 192.168.31.237
 ```
 
 4. **Clique em:** Save
@@ -102,9 +102,9 @@ nameserver 1.1.1.1
 
 ```bash
 # Testar resolução de nomes
-nslookup jellyfin.homelab.local
-nslookup pihole.homelab.local
-ping nextcloud.homelab.local
+nslookup jellyfin.homelab
+nslookup pihole.homelab
+ping nextcloud.homelab
 
 # Testar bloqueio de anúncios
 nslookup doubleclick.com
@@ -115,7 +115,7 @@ nslookup doubleclick.com
 
 ## Adicionar Wildcard DNS (Opcional)
 
-Para suportar `*.homelab.local` sem adicionar cada subdomínio:
+Para suportar `*.homelab` sem adicionar cada subdomínio:
 
 ### Opção 1: Usar dnsmasq no Pi-hole
 
@@ -124,7 +124,7 @@ Para suportar `*.homelab.local` sem adicionar cada subdomínio:
 docker exec -it pihole_pihole.1 bash
 
 # Editar configuração do dnsmasq
-echo "address=/.homelab.local/192.168.31.237" >> /etc/dnsmasq.d/02-homelab.conf
+echo "address=/.homelab/192.168.31.237" >> /etc/dnsmasq.d/02-homelab.conf
 
 # Reiniciar Pi-hole
 exit
@@ -189,7 +189,7 @@ nslookup google.com
 nslookup doubleclick.com
 # Deve retornar 0.0.0.0 (bloqueado pelo Pi-hole)
 
-ping jellyfin.homelab.local
+ping jellyfin.homelab
 # Deve resolver para 192.168.31.237
 ```
 
@@ -197,7 +197,7 @@ ping jellyfin.homelab.local
 
 1. Acesse sites normalmente - devem funcionar
 2. Anúncios devem estar bloqueados em sites
-3. Navegue para `jellyfin.homelab.local` - deve funcionar
+3. Navegue para `jellyfin.homelab` - deve funcionar
 
 ---
 

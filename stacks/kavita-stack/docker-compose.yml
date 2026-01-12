@@ -1,6 +1,6 @@
 # Kavita Stack
 # Modern digital library server for EPUB, PDF, comics, and manga
-# Deploy with: docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
+# Deploy with: docker stack deploy -c stacks/kavita-stack/media.docker-compose.yml kavita
 
 version: '3.8'
 

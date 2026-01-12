@@ -25,7 +25,7 @@ nano redis_password.txt
 
 # 3. Deploy stack
 cd ..
-docker stack deploy -c docker-compose.yml database
+docker stack deploy -c media.docker-compose.yml database
 ```
 
 ## Creating Databases

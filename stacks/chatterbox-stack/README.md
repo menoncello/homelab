@@ -63,7 +63,7 @@ sudo chown -R 1000:1000 /media/audiobooks/
 cd stacks/chatterbox-stack
 
 # Deploy stack
-docker stack deploy -c docker-compose.yml chatterbox-stack
+docker stack deploy -c media.docker-compose.yml chatterbox-stack
 ```
 
 ### Verify Deployment
@@ -79,7 +79,7 @@ docker service logs -f chatterbox-stack_chatterbox-api
 curl http://192.168.31.5:5123/health
 
 # Test via Traefik (after proxy config)
-curl http://chatterbox.homelab.local/health
+curl http://chatterbox.homelab/health
 ```
 
 ## Usage
@@ -127,7 +127,7 @@ curl -X POST http://192.168.31.5:5123/v1/audio/speech \
 Access the interactive API documentation:
 - **Swagger UI:** http://192.168.31.5:5123/docs
 - **ReDoc:** http://192.168.31.5:5123/redoc
-- **Via Traefik:** http://chatterbox.homelab.local/docs
+- **Via Traefik:** http://chatterbox.homelab/docs
 
 ## Configuration
 
@@ -201,7 +201,7 @@ docker pull travisvn/chatterbox-tts-api:latest
 
 # Redeploy
 cd stacks/chatterbox-stack
-docker stack deploy -c docker-compose.yml chatterbox-stack
+docker stack deploy -c media.docker-compose.yml chatterbox-stack
 ```
 
 ### Clean Model Cache

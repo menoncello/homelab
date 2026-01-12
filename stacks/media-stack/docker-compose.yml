@@ -110,6 +110,40 @@ services:
         protocol: tcp
         mode: host
 
+  # Navidrome - Modern music streaming server
+  navidrome:
+    image: deluan/navidrome:0.53.3
+    hostname: navidrome
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=24h
+      - ND_BASEURL=/navidrome
+    volumes:
+      - navidrome-data:/data
+      - navidrome-music:/music:ro
+    networks:
+      - homelab-net
+    ports:
+      - target: 4533
+        published: 4533
+        protocol: tcp
+        mode: host
+
 networks:
   homelab-net:
     external: true
@@ -122,3 +156,12 @@ volumes:
   jellyfin-cache:
     driver: local
     name: jellyfin-cache
+  navidrome-data:
+    driver: local
+    name: navidrome-data
+  navidrome-music:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/music

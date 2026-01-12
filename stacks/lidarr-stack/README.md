@@ -29,7 +29,7 @@ sudo chown -R 1000:1000 /media/downloads
 
 # 4. Deploy stack (from manager)
 cd ~/homelab/stacks/lidarr-stack
-docker stack deploy -c docker-compose.yml lidarr
+docker stack deploy -c media.docker-compose.yml lidarr
 
 # 5. Verify deployment
 docker service ls | grep lidarr

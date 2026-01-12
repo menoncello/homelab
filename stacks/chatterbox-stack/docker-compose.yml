@@ -23,7 +23,7 @@ services:
         max_attempts: 3
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.chatterbox.rule=Host(`chatterbox.homelab.local`)"
+        - "traefik.http.routers.chatterbox.rule=Host(`chatterbox.homelab`)"
         - "traefik.http.routers.chatterbox.entrypoints=web"
         - "traefik.http.services.chatterbox.loadbalancer.server.port=5123"
     environment:

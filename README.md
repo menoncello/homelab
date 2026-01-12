@@ -80,17 +80,17 @@ docker network create --driver overlay --attachable homelab-net
 ./scripts/setup-nodes.sh
 
 # 5. Deploy stacks in order
-docker stack deploy -c stacks/infrastructure/docker-compose.yml infrastructure
-docker stack deploy -c stacks/proxy/docker-compose.yml proxy
-docker stack deploy -c stacks/database-stack/docker-compose.yml database-stack
-docker stack deploy -c stacks/content/docker-compose.yml content
-docker stack deploy -c stacks/gpu-services/docker-compose.yml gpu-services
-docker stack deploy -c stacks/arr-stack/docker-compose.yml arr-stack
-docker stack deploy -c stacks/homarr-stack/docker-compose.yml homarr-stack
-docker stack deploy -c stacks/n8n-stack/docker-compose.yml n8n-stack
-docker stack deploy -c stacks/lidarr-stack/docker-compose.yml lidarr-stack
-docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
-docker stack deploy -c stacks/stacks-stack/docker-compose.yml stacks
+docker stack deploy -c stacks/infrastructure/media.docker-compose.yml infrastructure
+docker stack deploy -c stacks/proxy/media.docker-compose.yml proxy
+docker stack deploy -c stacks/database-stack/media.docker-compose.yml database-stack
+docker stack deploy -c stacks/content/media.docker-compose.yml content
+docker stack deploy -c stacks/gpu-services/media.docker-compose.yml gpu-services
+docker stack deploy -c stacks/arr-stack/media.docker-compose.yml arr-stack
+docker stack deploy -c stacks/homarr-stack/media.docker-compose.yml homarr-stack
+docker stack deploy -c stacks/n8n-stack/media.docker-compose.yml n8n-stack
+docker stack deploy -c stacks/lidarr-stack/media.docker-compose.yml lidarr-stack
+docker stack deploy -c stacks/kavita-stack/media.docker-compose.yml kavita
+docker stack deploy -c stacks/stacks-stack/media.docker-compose.yml stacks
 ```
 
 ## Access Services
@@ -119,16 +119,16 @@ After deployment:
 - **n8n:** http://192.168.31.6:5678 - Workflow automation
 
 **Configure proxy hosts** in Nginx Proxy Manager:
-  - jellyfin.homelab.local → jellyfin:8096
-  - sonarr.homelab.local → sonarr:8989
-  - radarr.homelab.local → radarr:7878
-  - lidarr.homelab.local → lidarr:8686
-  - transmission.homelab.local → transmission:9091
-  - nextcloud.homelab.local → nextcloud:8080
-  - audiobooks.homelab.local → audiobookshelf:80
-  - kavita.homelab.local → kavita:5000
-  - stacks.homelab.local → stacks:7788
-  - n8n.homelab.local → n8n:5678
+  - jellyfin.homelab → jellyfin:8096
+  - sonarr.homelab → sonarr:8989
+  - radarr.homelab → radarr:7878
+  - lidarr.homelab → lidarr:8686
+  - transmission.homelab → transmission:9091
+  - nextcloud.homelab → nextcloud:8080
+  - audiobooks.homelab → audiobookshelf:80
+  - kavita.homelab → kavita:5000
+  - stacks.homelab → stacks:7788
+  - n8n.homelab → n8n:5678
 
 ## Stack Details
 
@@ -145,7 +145,7 @@ After deployment:
 2. Login with piholeadmin2024
 3. Change password
 4. Configure router DHCP to use 192.168.31.237 as DNS server
-5. Add local DNS records for *.homelab.local
+5. Add local DNS records for *.homelab
 
 ### Infrastructure Stack
 Creates persistent volumes bound to NVMe mount points.
@@ -220,7 +220,7 @@ docker service logs -f gpu-services_jellyfin
 
 ```bash
 # Redeploy stack
-docker stack deploy -c stacks/gpu-services/docker-compose.yml gpu-services
+docker stack deploy -c stacks/gpu-services/media.docker-compose.yml gpu-services
 
 # Update service image
 docker service update --image jellyfin:newversion gpu-services_jellyfin

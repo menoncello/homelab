@@ -28,7 +28,7 @@ sudo chown -R 1000:1000 /media/books
 
 # 2. Deploy stack
 cd ~/homelab
-docker stack deploy -c stacks/kavita-stack/docker-compose.yml kavita
+docker stack deploy -c stacks/kavita-stack/media.docker-compose.yml kavita
 
 # 3. Verify deployment
 docker service ps kavita_kavita

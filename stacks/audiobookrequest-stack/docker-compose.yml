@@ -1,6 +1,6 @@
 # AudioBookRequest Stack
 # Audiobook request management/wishlist for Audiobookshelf
-# Deploy with: docker stack deploy -c stacks/audiobookrequest-stack/docker-compose.yml audiobookrequest
+# Deploy with: docker stack deploy -c stacks/audiobookrequest-stack/media.docker-compose.yml audiobookrequest
 #
 # Features:
 # - Overseer/Jellyseerr-like interface for audiobooks

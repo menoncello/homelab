@@ -1,0 +1,43 @@
+# Portainer Stack
+# Docker management UI
+# Deploy with: docker stack deploy -c stacks/infrastructure/portainer/media.docker-compose.yml portainer
+
+version: '3.8'
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    hostname: portainer
+    command: -H unix:///var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/docker/portainer:/data
+    networks:
+      - homelab-net
+    ports:
+      - target: 9000
+        published: 9000
+        protocol: tcp
+        mode: host
+      - target: 9443
+        published: 9443
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net

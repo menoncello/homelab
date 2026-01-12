@@ -1,0 +1,5 @@
+# Productivity Stack
+# n8n, AnyNote, OnlyOffice
+version: '3.8'
+
+# Include all productivity services

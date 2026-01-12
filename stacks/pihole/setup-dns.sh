@@ -35,25 +35,25 @@ sudo tee /data/docker/pihole/local-dns.conf > /dev/null <<'DNSCONFIG'
 # Local DNS Records for Homelab
 
 # Helios (192.168.31.5) Services
-address=/jellyfin.homelab.local/192.168.31.5
-address=/sonarr.homelab.local/192.168.31.5
-address=/radarr.homelab.local/192.168.31.5
-address=/lidarr.homelab.local/192.168.31.5
-address=/transmission.homelab.local/192.168.31.5
-address=/homarr.homelab.local/192.168.31.5
-address=/pihole.homelab.local/192.168.31.5
-address=/proxy.homelab.local/192.168.31.5
+address=/jellyfin.homelab/192.168.31.5
+address=/sonarr.homelab/192.168.31.5
+address=/radarr.homelab/192.168.31.5
+address=/lidarr.homelab/192.168.31.5
+address=/transmission.homelab/192.168.31.5
+address=/home.homelab/192.168.31.5
+address=/pihole.homelab/192.168.31.5
+address=/proxy.homelab/192.168.31.5
 
 # Xeon01 (192.168.31.6) Services
-address=/nextcloud.homelab.local/192.168.31.6
-address=/audiobookshelf.homelab.local/192.168.31.6
-address=/n8n.homelab.local/192.168.31.6
-address=/kavita.homelab.local/192.168.31.6
-address=/stacks.homelab.local/192.168.31.6
+address=/nextcloud.homelab/192.168.31.6
+address=/audiobookshelf.homelab/192.168.31.6
+address=/n8n.homelab/192.168.31.6
+address=/kavita.homelab/192.168.31.6
+address=/stacks.homelab/192.168.31.6
 
 # Server aliases
-address=/helios.homelab.local/192.168.31.5
-address=/xeon01.homelab.local/192.168.31.6
+address=/helios.homelab/192.168.31.5
+address=/xeon01.homelab/192.168.31.6
 DNSCONFIG
 
 sudo chown 1000:1000 /data/docker/pihole/local-dns.conf
@@ -80,7 +80,7 @@ echo "   cd ~/repos/setup/homelab/stacks/pihole"
 echo "   docker -H ssh://eduardo@192.168.31.5 stack deploy -c docker-compose.yml pihole"
 echo ""
 echo "2. Teste a resolução de DNS:"
-echo "   dig @192.168.31.5 jellyfin.homelab.local"
+echo "   dig @192.168.31.5 jellyfin.homelab"
 echo ""
 echo "3. Configure seus dispositivos para usar DNS: 192.168.31.5"
 echo ""

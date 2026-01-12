@@ -33,7 +33,7 @@ docker stack rm kavita stacks
 
 # 3. Deploy Calibre-Web Automated stack
 cd ~/homelab
-docker stack deploy -c stacks/calibre-stack/docker-compose.yml calibre
+docker stack deploy -c stacks/calibre-stack/media.docker-compose.yml calibre
 
 # 4. Verify deployment
 docker service ps calibre_calibre

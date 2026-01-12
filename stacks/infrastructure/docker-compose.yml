@@ -1,11 +1,156 @@
-# Infrastructure Stack
-# Defines base volumes and network configuration for Homelab
-# Deploy with: docker stack deploy -c stacks/infrastructure/docker-compose.yml infrastructure
-
 version: '3.8'
 
-# This stack primarily defines volumes for use by other stacks
-# No actual services run, but volumes are created globally
+services:
+  nginx-proxy:
+    image: jc21/nginx-proxy-manager:latest
+    hostname: proxy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.proxy == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - nginx-proxy-data:/data
+      - nginx-proxy-letsencrypt:/etc/letsencrypt
+    networks:
+      - homelab-net
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+      - target: 81
+        published: 81
+        protocol: tcp
+        mode: host
+  pihole:
+    image: pihole/pihole:latest
+    hostname: pihole
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.proxy == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - WEBPASSWORD=CmMbNpaWzPCpUwV7gEghGFenrVUKApNAW8wg8phA
+      - PIHOLE_DNS_=1.1.1.1;1.0.0.1
+      - DNSMASQ_LISTENING=all
+      - SERVERIP=192.168.31.5
+      - VIRTUAL_HOST=pihole.menoncello.com
+      - WEBTHEME=default-darker
+      # Permitir queries de qualquer rede
+      - DNSMASQ_INTERFACE=
+      - FTLCONF_dns_listeningMode=all
+    volumes:
+      - pihole-config:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
+      - /data/docker/pihole/local-dns.conf:/etc/dnsmasq.d/02-homelab.conf:ro
+    networks:
+      - homelab-net
+    ports:
+      # DNS (TCP/UDP)
+      - target: 53
+        published: 53
+        protocol: tcp
+        mode: host
+      - target: 53
+        published: 53
+        protocol: udp
+        mode: host
+      # Web Interface (porta alternativa para não conflitar com Nginx)
+      - target: 80
+        published: 8053
+        protocol: tcp
+        mode: host
+      # DHCP (opcional)
+      - target: 67
+        published: 67
+        protocol: udp
+        mode: host
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    hostname: homarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - TIMEOUT=10000
+      - SECRET_ENCRYPTION_KEY=bd01d3b99d7c28f55759aeaaedbe20293dddf52ec6e8b4c59b6885a94465cb19
+      - BASE_URL=home.homelab
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - homarr-data:/app/data
+    networks:
+      - homelab-net
+    ports:
+      - target: 7575
+        published: 7575
+        protocol: tcp
+        mode: host
+  dashdot:
+    image: mauricenino/dashdot:latest
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+    privileged: true
+    environment:
+      - DASHDOT_ENABLE_INTERNET_CHECK=true
+      - DASHDOT_ENABLE_SERVER_CHECK=true
+      - DASHDOT_FS_TYPE_FILTER=[]
+    volumes:
+      - /:/host:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homelab-net
+    ports:
+      - target: 3001
+        published: 3001
+        protocol: tcp
+        mode: host
 
 networks:
   homelab-net:
@@ -13,118 +158,25 @@ networks:
     name: homelab-net
 
 volumes:
-  # Helios volumes (configs on /data - 337.8GB NVMe)
-  jellyfin-config:
-    name: jellyfin-config
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/jellyfin
-
-  sonarr-config:
-    name: sonarr-config
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/sonarr
-
-  radarr-config:
-    name: radarr-config
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/radarr
-
-  transmission-config:
-    name: transmission-config
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/transmission
-
   nginx-proxy-data:
+    external: true
     name: nginx-proxy-data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/docker/nginx-proxy
 
-  # Xeon01 volumes (configs on /srv - 434.1GB NVMe)
-  nextcloud-data:
-    name: nextcloud-data
+  nginx-proxy-letsencrypt:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /srv/docker/nextcloud
+    name: nginx-proxy-letsencrypt
 
-  audiobookshelf-config:
-    name: audiobookshelf-config
+  pihole-config:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /srv/docker/audiobookshelf/config
+    name: pihole-config
 
-  postgresql-data:
-    name: postgresql-data
+  pihole-dnsmasq:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /srv/docker/postgresql/data
+    name: pihole-dnsmasq
 
-  # Xeon01 large data (on /home - 793.8GB)
-  audiobooks-data:
-    name: audiobooks-data
+  homarr-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/docker-data/audiobooks
-
-  nextcloud-userdata:
-    name: nextcloud-userdata
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/docker-data/nextcloud
-
-  # Media volumes (on Helios /media - 955.6GB NVMe)
-  movies-data:
-    name: movies-data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/movies
-
-  series-data:
-    name: series-data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/series
-
-  anime-data:
-    name: anime-data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/anime
-
-  downloads-data:
-    name: downloads-data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /media/incomplete
+      device: /data/docker/homarr

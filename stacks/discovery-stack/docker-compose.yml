@@ -1,0 +1,567 @@
+# Discovery Stack
+# Media discovery and automation services (ARR, requests, tracking)
+# Deploy with: docker stack deploy -c stacks/discovery-stack/docker-compose.yml discovery
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # VIDEO AUTOMATION (Sonarr, Radarr)
+  # ============================================================================
+
+  # Sonarr - TV series automation
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:latest
+    hostname: sonarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - sonarr-config:/config
+      - /media/series:/media/series
+      - /media/incomplete:/downloads
+    networks:
+      - homelab-net
+    ports:
+      - target: 8989
+        published: 8989
+        protocol: tcp
+        mode: host
+
+  # Radarr - Movie automation
+  radarr:
+    image: ghcr.io/linuxserver/radarr:latest
+    hostname: radarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - radarr-config:/config
+      - /media/movies:/media/movies
+      - /media/incomplete:/downloads
+    networks:
+      - homelab-net
+    ports:
+      - target: 7878
+        published: 7878
+        protocol: tcp
+        mode: host
+
+  # Bazarr - Subtitle automation
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    hostname: bazarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - bazarr-config:/config
+      - /media/series:/media/series
+      - /media/movies:/media/movies
+    networks:
+      - homelab-net
+    ports:
+      - target: 6767
+        published: 6767
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # MUSIC AUTOMATION (Lidarr)
+  # ============================================================================
+
+  # Lidarr - Music collection automation
+  lidarr:
+    image: ghcr.io/linuxserver/lidarr:latest
+    hostname: lidarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+      restart_policy:
+        condition: any
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - UMASK=022
+    volumes:
+      - lidarr-config:/config
+      - /media/downloads:/downloads
+      - /media/music:/music
+    networks:
+      - homelab-net
+    ports:
+      - target: 8686
+        published: 8686
+        protocol: tcp
+        mode: host
+
+  # Lidify - Music discovery via Spotify/LastFM
+  lidify:
+    image: thewicklowwolf/lidify:latest
+    hostname: lidify
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.proxy == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - LIDARR_API_KEY=${LIDARR_API_KEY}
+      - LIDARR_URL=http://lidarr:8686
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - LASTFM_API_KEY=${LASTFM_API_KEY}
+    volumes:
+      - lidify-config:/app/config
+    networks:
+      - homelab-net
+    ports:
+      - target: 5000
+        published: 3333
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # AUDIOBOOK AUTOMATION (Listenarr)
+  # ============================================================================
+
+  # Listenarr - Audiobook collection automation (experimental, no Prowlarr support)
+  listenarr:
+    image: ghcr.io/therobbiedavis/listenarr:canary
+    hostname: listenarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: any
+    environment:
+      - LISTENARR_PUBLIC_URL=http://listenarr.homelab
+      - TZ=America/Sao_Paulo
+    volumes:
+      - listenarr-config:/app/config
+      - /media/downloads:/downloads
+      - /media/audiobooks:/audiobooks
+    networks:
+      - homelab-net
+    ports:
+      - target: 5000
+        published: 8988
+        protocol: tcp
+        mode: host
+
+  # Chaptarr - Audiobook & ebook automation (active Readarr fork with Prowlarr support)
+  chaptarr:
+    image: robertlordhood/chaptarr:latest
+    hostname: chaptarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - chaptarr-config:/config
+      - /media/downloads:/downloads
+      - /media/audiobooks:/audiobooks
+      - /media/books:/books
+    networks:
+      - homelab-net
+    ports:
+      - target: 8789
+        published: 8789
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # INDEXERS (Prowlarr, Jackett)
+  # ============================================================================
+
+  # Prowlarr - Centralized indexer manager
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    hostname: prowlarr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - prowlarr-config:/config
+    networks:
+      - homelab-net
+    ports:
+      - target: 9696
+        published: 9696
+        protocol: tcp
+        mode: host
+
+  # FlareSolverr - Bypass Cloudflare protection for indexers
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    hostname: flaresolverr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=America/Sao_Paulo
+    networks:
+      - homelab-net
+    ports:
+      - target: 8191
+        published: 8191
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # DOWNLOAD CLIENT (qBittorrent)
+  # ============================================================================
+
+  # qBittorrent - Torrent download client
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    hostname: qbittorrent
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - PUID=911
+      - PGID=911
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=9091
+      - UMASK=000
+    volumes:
+      - qbittorrent-config:/config
+      - /media/incomplete:/downloads
+      - /media/audiobooks:/audiobooks
+      - qbittorrent-watch:/watch
+    networks:
+      - homelab-net
+    ports:
+      - target: 9091
+        published: 9091
+        protocol: tcp
+        mode: host
+      - target: 6881
+        published: 6881
+        protocol: tcp
+        mode: host
+      - target: 6881
+        published: 6881
+        protocol: udp
+        mode: host
+
+  # ============================================================================
+  # REQUEST MANAGEMENT (Jellyseerr)
+  # ============================================================================
+
+  # Jellyseerr - Media request management
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    hostname: jellyseerr
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.arr == true
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - LOG_LEVEL=info
+    volumes:
+      - jellyseerr-config:/app/config
+    networks:
+      - homelab-net
+    ports:
+      - target: 5055
+        published: 5055
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # WATCHLIST SYNC (ListSync)
+  # ============================================================================
+
+  # ListSync - Sync watchlists from external services
+  list-sync:
+    image: ghcr.io/woahai321/list-sync:latest
+    hostname: list-sync
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+      - JELLYSEERR_URL=http://jellyseerr:5055
+      - JELLYSEERR_API_KEY=${JELLYSEERR_API_KEY}
+      - TRAKT_CLIENT_ID=${TRAKT_CLIENT_ID}
+      - TRAKT_CLIENT_SECRET=${TRAKT_CLIENT_SECRET}
+      - TRAKT_ACCESS_TOKEN=${TRAKT_ACCESS_TOKEN}
+      - IMDB_USER_LIST_URL=${IMDB_USER_LIST_URL}
+      - LETTERBOXD_USERNAME=${LETTERBOXD_USERNAME}
+      - SYNC_INTERVAL=1h
+    volumes:
+      - list-sync-data:/config
+    networks:
+      - homelab-net
+    ports:
+      - target: 3222
+        published: 8082
+        protocol: tcp
+        mode: host
+
+  # ============================================================================
+  # MEDIA TRACKING (Movary)
+  # ============================================================================
+
+  # Movary - Self-hosted media tracker
+  movary:
+    image: leepeuker/movary:latest
+    hostname: movary
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.proxy == true
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - movary-db:/app/db
+      - movary-cache:/app/cache
+      - movary-images:/app/images
+      - movary-logs:/app/logs
+    networks:
+      - homelab-net
+    ports:
+      - target: 8080
+        published: 5056
+        protocol: tcp
+        mode: host
+
+networks:
+  homelab-net:
+    external: true
+    name: homelab-net
+
+volumes:
+  # Video automation
+  sonarr-config:
+    external: true
+    name: sonarr-config
+
+  radarr-config:
+    external: true
+    name: radarr-config
+
+  bazarr-config:
+    external: true
+    name: bazarr-config
+
+  # Music automation
+  lidarr-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/lidarr
+
+  lidify-config:
+    driver: local
+    name: lidify-config
+
+  # Audiobook automation
+  listenarr-config:
+    driver: local
+    name: listenarr-config
+
+  chaptarr-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/chaptarr
+
+  # Indexers
+  prowlarr-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/prowlarr
+
+  jackett-config:
+    external: true
+    name: jackett-config
+
+  # Download client
+  qbittorrent-config:
+    external: true
+    name: transmission-config
+
+  qbittorrent-watch:
+    driver: local
+    name: transmission-watch
+
+  # Request management
+  jellyseerr-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/docker/jellyseerr
+
+  # Watchlist sync
+  list-sync-data:
+    driver: local
+    name: list-sync-data
+
+  # Media tracking
+  movary-db:
+    driver: local
+    name: movary-db
+
+  movary-cache:
+    driver: local
+    name: movary-cache
+
+  movary-images:
+    driver: local
+    name: movary-images
+
+  movary-logs:
+    driver: local
+    name: movary-logs

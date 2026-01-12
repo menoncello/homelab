@@ -29,7 +29,7 @@ sudo chown -R 1000:1000 /srv/docker/books
 
 # 2. Deploy stack (from manager)
 cd ~/homelab/stacks/stacks-stack
-docker stack deploy -c docker-compose.yml stacks
+docker stack deploy -c media.docker-compose.yml stacks
 
 # 3. Verify deployment
 docker service ps stacks_stacks

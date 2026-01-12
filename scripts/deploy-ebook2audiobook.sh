@@ -86,7 +86,7 @@ fi
 echo ""
 echo "Deploying ebook2audiobook stack..."
 cd "$STACK_DIR"
-docker stack deploy -c docker-compose.yml ebook2audiobook
+docker stack deploy -c media.docker-compose.yml ebook2audiobook
 
 # Wait for service to start
 echo ""

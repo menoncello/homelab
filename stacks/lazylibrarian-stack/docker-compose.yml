@@ -1,6 +1,6 @@
 # LazyLibrarian Stack
 # Author follow and ebook/audiobook automation
-# Deploy with: docker stack deploy -c stacks/lazylibrarian-stack/docker-compose.yml lazylibrarian
+# Deploy with: docker stack deploy -c stacks/lazylibrarian-stack/media.docker-compose.yml lazylibrarian
 #
 # Features:
 # - Follow authors and auto-grab new releases

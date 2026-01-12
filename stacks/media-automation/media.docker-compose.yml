@@ -1,0 +1,5 @@
+# Media Automation Stack
+# Sonarr, Radarr, Lidarr, Prowlarr, Jellyseerr, Transmission, Bazarr, Jackett, Listenarr, Stacks
+version: '3.8'
+
+# Include all media automation services

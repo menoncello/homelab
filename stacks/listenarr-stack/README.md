@@ -17,7 +17,7 @@ Audiobook collection manager - similar to Sonarr/Radarr but for audiobooks.
 
 ```bash
 cd stacks/listenarr-stack
-docker stack deploy -c docker-compose.yml listenarr
+docker stack deploy -c media.docker-compose.yml listenarr
 ```
 
 ## Access
@@ -29,7 +29,7 @@ docker stack deploy -c docker-compose.yml listenarr
 
 ### First Time Setup
 
-1. Open the web UI at http://listenarr.homelab.local:5000
+1. Open the web UI at http://listenarr.homelab:5000
 2. Create your admin account
 3. Configure your download client (qBittorrent, Transmission, etc.)
 4. Add Jackett or other indexers for audiobook search
